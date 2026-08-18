@@ -70,12 +70,11 @@ export default defineType({
       description: 'Leave empty on solo days — the app and site both show a "solo leg" state automatically.',
     }),
     defineField({
-      name: 'stageComplete',
-      title: 'Stage Complete',
+      name: 'dayComplete',
+      title: 'Day Complete',
       type: 'boolean',
-      description: 'Tick once the guest has finished their stage. Miles and stats will only show on the site when this is checked.',
+      description: 'Tick once the day is done. Miles only count toward the countdown and stats only show once this is checked.',
       initialValue: false,
-      hidden: ({document}) => !document?.ridingTodayGuest,
     }),
     defineField({
       name: 'journal',
