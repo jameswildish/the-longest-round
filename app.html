@@ -35,8 +35,9 @@
   #phone{position:relative;flex:1;display:flex;flex-direction:column;background:var(--ground);overflow:hidden;max-width:500px;margin:0 auto;width:100%;min-height:100vh;}
 
   .appbar{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 10px;border-bottom:1px solid var(--hairline);flex:none;}
-  .app-logo{font-family:var(--font-display);font-weight:500;font-size:14.5px;letter-spacing:0.02em;}
+  .app-logo{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:500;font-size:14.5px;letter-spacing:0.02em;}
   .app-logo b{font-weight:600;color:var(--ember-strong);}
+  .tsh-icon{width:26px;height:26px;flex:none;}
   .sync-pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:0.04em;color:var(--ink-dim);background:var(--surface);border:1px solid var(--hairline);padding:5px 10px 5px 8px;border-radius:999px;white-space:nowrap;}
   .sync-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--aurora);box-shadow:0 0 0 3px var(--aurora-dim);flex:none;}
 
@@ -222,7 +223,7 @@
 
 <div id="phone">
       <div class="appbar">
-        <span class="app-logo"><b>The</b> Longest Round</span>
+        <span class="app-logo"><svg class="tsh-icon" viewBox="-60 -60 120 120" xmlns="http://www.w3.org/2000/svg"><path d="M25.9,21.6 L42.3,35.2 A55,55,0,0,1,19.3,51.4 L11.6,31.4 A33.7,33.7,0,0,0,25.9,21.6Z" fill="#8b8a2b"/><circle cx="0" cy="0" r="55" fill="none" stroke="#f3efe4" stroke-width="2.2"/><circle cx="0" cy="0" r="33.7" fill="none" stroke="#f3efe4" stroke-width="2.2"/><rect x="-39.6" y="-39.6" width="79.2" height="79.2" fill="none" stroke="#f3efe4" stroke-width="1.2" opacity="0.6"/><g stroke="#f3efe4" stroke-width="1.2"><line x1="0" y1="0" x2="0" y2="-55"/><line x1="0" y1="0" x2="32.3" y2="-44.5"/><line x1="0" y1="0" x2="52.3" y2="-17"/><line x1="0" y1="0" x2="55" y2="0"/><line x1="0" y1="0" x2="42.3" y2="35.2"/><line x1="0" y1="0" x2="19.3" y2="51.4"/><line x1="0" y1="0" x2="0" y2="55"/><line x1="0" y1="0" x2="-38.9" y2="38.9"/><line x1="0" y1="0" x2="-55" y2="0"/><line x1="0" y1="0" x2="-38.9" y2="-38.9"/></g><text x="26" y="42" fill="#f3efe4" font-family="'Times New Roman',Georgia,serif" font-size="16" text-anchor="middle" dominant-baseline="central">VI</text></svg><span><b>The</b> Longest Round</span></span>
         <span class="sync-pill"><i class="dot"></i>Synced 6m ago</span>
       </div>
 
@@ -532,7 +533,8 @@ function boot(sanityData){
   var LEAD = { id:'darren', isLead:true, initials:'DB', name:'Darren Barker', role:'Solo Challenge Lead' };
 
   if (!sanityData || !sanityData.dailyEntries || !sanityData.dailyEntries.length) {
-    document.getElementById('phone').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;color:var(--ink);opacity:0.7;font-size:15px;line-height:1.6;">No data yet.<br>Add daily entries in <a href="/studio" style="color:var(--aurora);">Sanity Studio</a> to get started.</div>';
+    document.querySelector('.screens').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:60vh;text-align:center;padding:40px;color:var(--ink);opacity:0.7;font-size:15px;line-height:1.6;">No data yet.<br>Add daily entries in <a href="/studio" style="color:var(--aurora);">Sanity Studio</a> to get started.</div>';
+    document.querySelector('.tabbar').style.display = 'none';
     return;
   }
   var ROUTE_STOPS = sanityData.routeStops || [];
