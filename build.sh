@@ -18,6 +18,5 @@ fi
 cp index.html output/index.html
 cp app.html output/app.html
 cp manifest.json output/manifest.json
-cp icon.svg output/icon.svg
 cp icon-192.png output/icon-192.png
 cp icon-512.png output/icon-512.png
