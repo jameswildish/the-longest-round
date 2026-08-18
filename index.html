@@ -536,22 +536,6 @@ function boot(sanityData){
     return reached.length ? reached[reached.length-1].order : 0;
   }
 
-  /* ---- Story ---- */
-  .story-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,48px);align-items:start;margin-top:32px;}
-  @media(max-width:720px){.story-grid{grid-template-columns:1fr;}}
-  .story-photo{border-radius:16px;overflow:hidden;}
-  .story-photo img{width:100%;height:auto;display:block;border-radius:16px;}
-  .story-copy{font-size:14.5px;line-height:1.75;color:var(--ink-dim);}
-  .story-copy .story-quote{font-size:18px;font-weight:700;color:var(--ember);line-height:1.5;margin:0 0 20px;font-style:italic;}
-  .story-copy p{margin:0 0 14px;}
-  .story-copy .story-stat{font-weight:700;color:var(--ink);}
-
-  /* ---- Sponsors / Partners ---- */
-  .partners-bar{display:flex;align-items:center;justify-content:center;gap:clamp(20px,3vw,40px);padding:12px clamp(20px,5vw,48px);border-top:1px solid var(--hairline);flex-wrap:wrap;}
-  .partners-bar span{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-faint);font-weight:600;}
-  .partners-bar .partner-slot{height:28px;padding:4px 14px;border:1px dashed var(--hairline-strong);border-radius:8px;font-size:11px;color:var(--ink-faint);display:flex;align-items:center;}
-
-  /* ---- Hero ---- */
   (function(){
     var remaining = TOTAL_TARGET_MILES - totalCycled;
     var el = document.getElementById('heroMilesRemaining');
