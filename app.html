@@ -51,7 +51,7 @@
   .rider-name{font-size:8.5px;letter-spacing:0.02em;color:var(--ink-faint);text-align:center;line-height:1.15;white-space:nowrap;}
   .rider-pill.active .rider-name{color:var(--ink-dim);}
 
-  .screens{position:relative;flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+  .screens{position:relative;flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-bottom:70px;}
   .screens::-webkit-scrollbar{display:none;}
   .screen{display:none;padding:16px 18px 28px;animation:screenIn .32s ease;}
   .screen.active{display:block;}
@@ -214,7 +214,7 @@
   .sheet-close{background:var(--surface-raised);border:1px solid var(--hairline);color:var(--ink-dim);width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;}
   .sheet-close svg{width:14px;height:14px;}
 
-  .tabbar{display:flex;justify-content:space-around;border-top:1px solid var(--hairline);padding:10px 6px calc(4px + env(safe-area-inset-bottom));flex:none;}
+  .tabbar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;border-top:1px solid var(--hairline);padding:10px 6px calc(4px + env(safe-area-inset-bottom));background:var(--ground);z-index:10;max-width:500px;margin:0 auto;}
   .tab{background:none;border:none;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:0.04em;text-transform:uppercase;font-weight:600;padding:4px 10px;cursor:pointer;}
   .tab svg{width:19px;height:19px;}
   .tab.active{color:var(--aurora-strong);}
