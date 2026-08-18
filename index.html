@@ -36,8 +36,10 @@
 
   /* ---- Header ---- */
   .site-header{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px clamp(20px,5vw,48px);background:rgba(21,21,21,0.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--hairline);flex-wrap:wrap;}
-  .brand-mark{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:0.02em;text-transform:uppercase;}
+  .brand-mark{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:0.02em;text-transform:uppercase;text-decoration:none;color:inherit;}
   .brand-mark b{font-weight:700;color:var(--ember-strong);}
+  .nav-toggle{display:none;background:none;border:1px solid var(--hairline);border-radius:8px;padding:6px 8px;color:var(--ink);cursor:pointer;line-height:1;}
+  .nav-toggle svg{display:block;width:20px;height:20px;}
   .tsh-icon{flex:none;}
   .site-nav{display:flex;gap:clamp(14px,2.4vw,26px);flex-wrap:wrap;}
   .site-nav a{font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-dim);text-decoration:none;font-weight:600;transition:color .2s ease;}
@@ -239,8 +241,12 @@
 
   /* ---- Mobile ---- */
   @media(max-width:600px){
-    .site-header{padding:12px 16px;flex-direction:column;align-items:flex-start;gap:10px;}
-    .site-nav{gap:6px 12px;font-size:10px;}
+    .site-header{padding:12px 16px;flex-direction:row;align-items:center;gap:10px;}
+    .nav-toggle{display:block;}
+    .site-nav{display:none;width:100%;flex-direction:column;gap:2px;order:3;background:var(--surface);border-radius:12px;padding:8px 0;}
+    .site-nav.open{display:flex;}
+    .site-nav a{padding:10px 16px;font-size:12px;border-radius:8px;}
+    .site-nav a:active{background:var(--surface-hi);}
     .hero{padding:clamp(40px,8vh,80px) 0 clamp(36px,6vh,60px);}
     .hero-title{font-size:clamp(28px,8vw,48px) !important;}
     .hero-sub{font-size:13px;padding:0 8px;}
@@ -273,8 +279,9 @@
 </style>
 
 <header class="site-header">
-  <div class="brand-mark"><span style="color:#FE4600;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-size:15px;">THE LONGEST ROUND</span></div>
-  <nav class="site-nav">
+  <a href="#" class="brand-mark" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;"><span style="color:#FE4600;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-size:15px;">THE LONGEST ROUND</span></a>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+  <nav class="site-nav" id="siteNav">
     <a href="#story">The Story</a>
     <a href="#journey">The Route</a>
     <a href="#latest">Latest Update</a>
@@ -285,6 +292,15 @@
     <a href="#sponsors">Sponsors &amp; Partners</a>
   </nav>
 </header>
+<script>
+document.getElementById('navToggle').addEventListener('click',function(){
+  var nav=document.getElementById('siteNav');
+  nav.classList.toggle('open');
+});
+document.getElementById('siteNav').addEventListener('click',function(e){
+  if(e.target.tagName==='A') this.classList.remove('open');
+});
+</script>
 
 <section class="hero">
   <div class="hero-backdrop">
@@ -294,7 +310,7 @@
   </div>
   <div class="wrap">
     <h1 class="hero-title" style="color:#FE4600;">The Longest Round</h1>
-    <p class="hero-sub">1,800 miles cycling. 30 miles of open water. One rider, Edinburgh to Morocco, for men's mental health and suicide prevention.</p>
+    <p class="hero-sub">Cycling 1,800 miles across four countries and two seas to deliver one message. Raising vital funds and awareness for men's mental health and suicide prevention.</p>
     <div class="hero-countdown">
       <span class="hero-count-num" id="heroMilesRemaining">0</span>
       <span class="hero-count-label">Miles To Morocco</span>
@@ -329,7 +345,7 @@
   <div class="wrap">
     <span class="eyebrow">The Route</span>
     <h2>Edinburgh to Morocco</h2>
-    <p class="section-sub">Ten stops and two open-water crossings, plotted from each stop's real coordinates - not hand-placed pins.</p>
+    <p class="section-sub">Four extreme stages, combining long-distance cycling with two of the world's most iconic open-water swims, plotted from each stop's real coordinates. Check back for my latest location and stop-offs.</p>
     <div class="journey-grid">
       <div class="map-panel">
         <div class="map-wrap" id="mapWrap">
@@ -488,7 +504,7 @@
   <div class="wrap">
     <span class="eyebrow">Follow The Journey</span>
     <h2>On Instagram</h2>
-    <p class="section-sub">Live updates, behind-the-scenes footage, and daily check-ins from the road.</p>
+    <p class="section-sub">Live updates, behind-the-scenes footage, and daily check-ins from the road and sea.</p>
     <div class="ig-cta">
       <a class="ig-profile" href="https://www.instagram.com/thelongestroundchallenge/" target="_blank" rel="noopener">
         <span class="ig-profile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></span>
@@ -740,11 +756,12 @@ function boot(sanityData){
     var avg7 = Math.round(last7.reduce(function(a,e){return a+e.cyclingMiles;},0)/last7.length);
     document.getElementById('latestSub').textContent = TODAY_ENTRY.dayDescription || (totalCycled.toLocaleString('en-GB') + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + swimStops.length + ' swims complete.');
 
-    document.getElementById('latestStats').innerHTML =
-      '<div class="stat-tile"><span class="stat-label">Cycling Today</span><span class="stat-value">'+TODAY_ENTRY.cyclingMiles+' mi</span></div>'+
-      '<div class="stat-tile"><span class="stat-label">Swimming</span><span class="stat-value">'+swimsDone+' of '+swimStops.length+'</span></div>'+
-      '<div class="stat-tile"><span class="stat-label">Recovery</span><span class="stat-value">'+TODAY_ENTRY.recoveryScore+'%</span></div>'+
-      '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m</span></div>';
+    var statTiles = '';
+    if (TODAY_ENTRY.cyclingMiles) statTiles += '<div class="stat-tile"><span class="stat-label">Cycling Today</span><span class="stat-value">'+TODAY_ENTRY.cyclingMiles+' mi</span></div>';
+    if (TODAY_ENTRY.swimmingMiles) statTiles += '<div class="stat-tile"><span class="stat-label">Swimming Today</span><span class="stat-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
+    if (TODAY_ENTRY.recoveryScore) statTiles += '<div class="stat-tile"><span class="stat-label">Recovery</span><span class="stat-value">'+TODAY_ENTRY.recoveryScore+'%</span></div>';
+    if (TODAY_ENTRY.sleepMinutes) statTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m</span></div>';
+    document.getElementById('latestStats').innerHTML = statTiles;
 
     var ritualsEl = document.getElementById('latestRituals');
     RITUALS.slice().sort(function(a,b){return a.order-b.order;}).forEach(function(r){
@@ -764,10 +781,15 @@ function boot(sanityData){
     var guestEl = document.getElementById('latestGuest');
     if (TODAY_ENTRY.ridingTodayGuestId){
       var g = GUESTS.find(function(x){ return x.id===TODAY_ENTRY.ridingTodayGuestId; });
-      var gtAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=76&h=76&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
-      guestEl.innerHTML = '<span class="avatar">'+gtAvatar+'</span><div><div class="name">'+g.name+' rode today</div><div class="role">'+(TODAY_ENTRY.ridingTodayNote||g.role)+'</div></div>';
+      if (g) {
+        var gtAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=76&h=76&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
+        var roleText = TODAY_ENTRY.ridingTodayNote || g.role || '';
+        guestEl.innerHTML = '<span class="avatar">'+gtAvatar+'</span><div><div class="name">'+g.name+' took part with Darren today</div>'+(roleText?'<div class="role">'+roleText+'</div>':'')+'</div>';
+      } else {
+        guestEl.style.display = 'none';
+      }
     } else {
-      guestEl.innerHTML = '<div class="role">Solo leg today - no guest rider scheduled.</div>';
+      guestEl.style.display = 'none';
     }
   })();
 
@@ -884,7 +906,7 @@ function boot(sanityData){
       var guestLine = '';
       if (e.ridingTodayGuestId){
         var g = GUESTS.find(function(x){ return x.id===e.ridingTodayGuestId; });
-        if (g) guestLine = '<div class="stat-tile"><span class="stat-label">Riding That Day</span><span class="stat-value" style="font-size:16px;">'+g.name+'</span></div>';
+        if (g) guestLine = '<div class="stat-tile"><span class="stat-label">Took Part</span><span class="stat-value" style="font-size:16px;">'+g.name+'</span></div>';
       }
       var ritualsHtml = RITUALS.slice().sort(function(a,b){return a.order-b.order;}).map(function(r){
         var done = e.ritualsCompleted.indexOf(r.id)>-1;
