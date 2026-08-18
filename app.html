@@ -385,21 +385,21 @@
               </svg>
               <div class="chart-legend">
                 <span><i class="dot-actual"></i>Actual</span>
-                <span><i class="dot-target"></i>On-pace target</span>
+                <span><i class="dot-target"></i>100 mi/day target</span>
               </div>
             </div>
 
             <div class="insight-card">
-              <span class="section-label">Pace To Goal</span>
+              <span class="section-label">Pace To Morocco</span>
               <p id="paceText"></p>
               <div class="progress-compare">
                 <div class="progress-row">
-                  <span class="progress-label">Miles Complete</span>
+                  <span class="progress-label">Overall</span>
                   <div class="progress-track"><div class="progress-fill miles" id="milesProgressFill"></div></div>
                   <span class="progress-pct" id="milesProgressPct"></span>
                 </div>
                 <div class="progress-row">
-                  <span class="progress-label">Days Elapsed</span>
+                  <span class="progress-label">vs Target</span>
                   <div class="progress-track"><div class="progress-fill days" id="daysProgressFill"></div></div>
                   <span class="progress-pct" id="daysProgressPct"></span>
                 </div>
@@ -852,13 +852,10 @@ function boot(sanityData){
 
   /* ---- Insights: all-time cumulative chart, with an on-pace target overlay ---- */
   (function(){
-    var cum = []; var run = 0;
-    DAILY_ENTRIES.forEach(function(e){ run += e.cyclingMiles; cum.push(run); });
-
-    var morocco = ROUTE_STOPS[ROUTE_STOPS.length-1];
-    var totalExpeditionDays = DAILY_ENTRIES.length + Math.max(0, morocco.arrivalOffsetDays);
-    var perDayTarget = TOTAL_TARGET_MILES / totalExpeditionDays;
-    var target = DAILY_ENTRIES.map(function(e,i){ return Math.round(perDayTarget*(i+1)); });
+    var cum = []; var run = 0; var activeDayCount = 0;
+    DAILY_ENTRIES.forEach(function(e){ run += e.cyclingMiles; cum.push(run); if(e.cyclingMiles>0) activeDayCount++; });
+    var TARGET_PER_DAY = 100;
+    var target = DAILY_ENTRIES.map(function(e,i){ return TARGET_PER_DAY*(i+1); });
 
     var chartW=320, chartH=120, pad=6;
     var allVals = cum.concat(target);
@@ -879,22 +876,18 @@ function boot(sanityData){
     document.getElementById('chartCallout').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Cycled · All-Time</span>';
   })();
 
-  /* ---- Insights: pace to goal, derived from the Morocco stop's arrival offset ---- */
+  /* ---- Insights: pace to Morocco, 100 mi/day target ---- */
   (function(){
-    var morocco = ROUTE_STOPS[ROUTE_STOPS.length-1];
-    var remainingDays = Math.max(1, morocco.arrivalOffsetDays);
     var remainingMiles = TOTAL_TARGET_MILES - totalCycled;
-    var neededPerDay = Math.round(remainingMiles/remainingDays);
-    var last7 = DAILY_ENTRIES.slice(-7);
-    var recentAvg = Math.round(last7.reduce(function(a,e){return a+e.cyclingMiles;},0)/last7.length);
-    var text = recentAvg >= neededPerDay
-      ? 'Averaging ' + recentAvg + ' mi/day this week - ahead of the ' + neededPerDay + ' mi/day needed to reach Morocco in ' + remainingDays + ' days.'
-      : 'Averaging ' + recentAvg + ' mi/day this week - ' + neededPerDay + ' mi/day is needed over the remaining ' + remainingDays + ' days to stay on schedule.';
+    var avgPerActiveDay = activeDayCount ? Math.round(totalCycled/activeDayCount) : 0;
+    var text = avgPerActiveDay >= TARGET_PER_DAY
+      ? 'Averaging ' + avgPerActiveDay + ' mi on active days - ahead of the ' + TARGET_PER_DAY + ' mi/day target. ' + remainingMiles.toLocaleString('en-GB') + ' miles to go.'
+      : 'Averaging ' + avgPerActiveDay + ' mi on active days against a ' + TARGET_PER_DAY + ' mi/day target. ' + remainingMiles.toLocaleString('en-GB') + ' miles to go.';
     document.getElementById('paceText').textContent = text;
 
-    var totalExpeditionDays = DAILY_ENTRIES.length + remainingDays;
     var milesPct = Math.round((totalCycled/TOTAL_TARGET_MILES)*100);
-    var daysPct = Math.round((DAILY_ENTRIES.length/totalExpeditionDays)*100);
+    var expectedMiles = activeDayCount * TARGET_PER_DAY;
+    var daysPct = expectedMiles ? Math.round((totalCycled/expectedMiles)*100) : 0;
     document.getElementById('milesProgressFill').style.width = milesPct+'%';
     document.getElementById('daysProgressFill').style.width = daysPct+'%';
     document.getElementById('milesProgressPct').textContent = milesPct+'%';
