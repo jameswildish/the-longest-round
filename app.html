@@ -24,41 +24,9 @@
   :focus-visible{outline:2px solid var(--aurora-strong);outline-offset:3px;border-radius:6px;}
   @media (prefers-reduced-motion:reduce){*{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}}
 
-  .stage{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:clamp(20px,4vw,56px) clamp(16px,4vw,40px) clamp(36px,6vw,64px);isolation:isolate;}
-  .backdrop{position:fixed;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(ellipse 60% 40% at 20% 8%, rgba(143,190,158,0.10), transparent 60%),radial-gradient(ellipse 50% 35% at 82% 4%, rgba(201,138,77,0.06), transparent 60%),var(--ground);}
-  .aurora{position:absolute;inset:-20% -10% auto -10%;height:70%;background:radial-gradient(ellipse 45% 60% at 30% 0%, rgba(143,190,158,0.22), transparent 65%),radial-gradient(ellipse 35% 50% at 68% 10%, rgba(170,212,184,0.14), transparent 60%),radial-gradient(ellipse 30% 45% at 50% -10%, rgba(201,138,77,0.10), transparent 60%);filter:blur(6px);animation:drift 26s ease-in-out infinite alternate;mix-blend-mode:screen;}
-  @keyframes drift{from{transform:translate3d(-2%,0,0) scale(1);}to{transform:translate3d(3%,2%,0) scale(1.06);}}
-  .stars{position:absolute;inset:0;}
-  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--ink);opacity:0.5;animation:twinkle 4.5s ease-in-out infinite;}
-  @keyframes twinkle{0%,100%{opacity:0.15;}50%{opacity:0.75;}}
-  .treeline{position:absolute;left:0;right:0;bottom:0;width:100%;height:auto;display:block;opacity:0.9;}
-  .giant-word{position:absolute;left:50%;bottom:-6%;transform:translateX(-50%);font-family:var(--font-display);font-weight:900;font-size:min(30vw,420px);line-height:0.8;letter-spacing:-0.02em;color:var(--aurora);opacity:0.055;white-space:nowrap;user-select:none;pointer-events:none;}
+  .stage{min-height:100vh;display:flex;flex-direction:column;}
 
-  .chrome-top{width:100%;max-width:640px;text-align:center;margin-bottom:clamp(28px,5vw,44px);transition:opacity .35s ease, max-height .35s ease;}
-  .brand-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:22px;}
-  .wordmark-side{font-family:var(--font-display);font-weight:300;font-size:clamp(20px,4vw,28px);letter-spacing:0.01em;color:var(--ink);}
-  .brand-tagline{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap;}
-  .eyebrow-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
-  .eyebrow{margin:0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-faint);}
-  .chrome-toggle{background:transparent;border:1px solid var(--hairline-strong);color:var(--ink-dim);padding:7px 14px;border-radius:999px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:border-color .2s ease, color .2s ease;}
-  .chrome-toggle:hover{border-color:var(--aurora);color:var(--aurora-strong);}
-  .chrome-toggle .eye{width:13px;height:13px;flex:none;}
-  .app-title{font-family:var(--font-display);font-weight:500;letter-spacing:0.04em;font-size:clamp(20px,3.2vw,28px);margin:0;}
-  .app-title span{font-family:var(--font-body);font-weight:400;letter-spacing:0.01em;color:var(--ink-dim);font-size:0.52em;vertical-align:middle;margin-left:2px;}
-  .chrome-bottom{width:100%;max-width:460px;text-align:center;margin-top:clamp(22px,4vw,34px);transition:opacity .35s ease, max-height .35s ease;}
-  .caption{margin:0;font-size:12px;line-height:1.6;color:var(--ink-faint);}
-  .stage.screenshot-mode .chrome-top,.stage.screenshot-mode .chrome-bottom,.stage.screenshot-mode .tab-preview{opacity:0;max-height:0;overflow:hidden;margin:0;pointer-events:none;}
-
-  .tab-preview{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap;justify-content:center;transition:opacity .35s ease, max-height .35s ease;}
-  .tab-preview button{background:var(--surface);border:1px solid var(--hairline);color:var(--ink-dim);padding:8px 16px;border-radius:999px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;transition:all .2s ease;}
-  .tab-preview button.active{background:var(--aurora-dim);border-color:var(--aurora);color:var(--aurora-strong);}
-
-  .phone-wrap{position:relative;display:flex;justify-content:center;}
-  .phone{position:relative;width:min(388px,92vw);height:min(852px,148vw);background:linear-gradient(180deg,#100f0c,#181712);border-radius:56px;border:1px solid rgba(243,239,228,0.08);box-shadow:var(--shadow), inset 0 0 0 8px rgba(0,0,0,0.55), inset 0 0 0 9px rgba(243,239,228,0.05);padding:14px 14px 0;display:flex;flex-direction:column;overflow:hidden;}
-  .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:112px;height:26px;background:#0a0a08;border-radius:16px;z-index:5;}
-  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:6px 14px 2px;font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
-  .statusbar-icons{display:flex;gap:5px;align-items:center;color:var(--ink);}
-  .statusbar-icons svg{display:block;}
+  #phone{flex:1;display:flex;flex-direction:column;background:var(--ground);overflow:hidden;max-width:500px;margin:0 auto;width:100%;min-height:100vh;}
 
   .appbar{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 10px;border-bottom:1px solid var(--hairline);flex:none;}
   .app-logo{font-family:var(--font-display);font-weight:500;font-size:14.5px;letter-spacing:0.02em;}
@@ -245,47 +213,10 @@
   .tab svg{width:19px;height:19px;}
   .tab.active{color:var(--aurora-strong);}
   .home-indicator{width:120px;height:4px;background:var(--ink);opacity:0.35;border-radius:99px;margin:6px auto 8px;}
-
-  @media (max-width:420px){.brand-tagline{display:none;}}
 </style>
 
 <div class="stage" id="stage">
-  <div class="backdrop" aria-hidden="true">
-    <div class="aurora"></div>
-    <div class="stars" id="stars"></div>
-    <svg class="treeline" viewBox="0 0 1440 140" preserveAspectRatio="none">
-      <polygon points="0,140 0,90 40,20 80,90 110,50 150,90 190,30 230,90 270,60 310,90 1440,90 1440,140" fill="#0a0906"/>
-      <polygon points="120,140 120,70 160,10 200,70 230,40 260,70 300,20 340,70 380,45 420,70 460,15 500,70 540,35 580,70 620,25 660,70 700,40 740,70 780,20 820,70 860,50 900,70 940,25 980,70 1020,40 1060,70 1100,15 1140,70 1180,45 1220,70 1260,25 1300,70 1340,50 1380,70 1440,55 1440,140 120,140" fill="#0c0b08"/>
-    </svg>
-    <div class="giant-word">1800</div>
-  </div>
-
-  <header class="chrome-top" id="chromeTop">
-    <div class="brand-row">
-      <span class="wordmark-side">Sixth</span>
-      <span class="brand-tagline">The Home Of High Performance</span>
-      <span class="wordmark-side">House</span>
-    </div>
-    <div class="eyebrow-row">
-      <p class="eyebrow">Product Concept · Ready For Sanity</p>
-      <button class="chrome-toggle" id="chromeToggle" type="button" aria-pressed="false">
-        <svg class="eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-        Screenshot mode
-      </button>
-    </div>
-    <h1 class="app-title">The Longest Round <span>— live tracker, by The Sixth House</span></h1>
-  </header>
-
-  <div class="phone-wrap">
-    <div class="phone" id="phone">
-      <div class="notch"></div>
-      <div class="statusbar">
-        <span>9:41</span>
-        <span class="statusbar-icons">
-          <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><rect x="0" y="6" width="3" height="4" rx=".5" fill="currentColor"/><rect x="4.5" y="4" width="3" height="6" rx=".5" fill="currentColor"/><rect x="9" y="1.5" width="3" height="8.5" rx=".5" fill="currentColor"/></svg>
-          <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="14" height="7" rx="1.5" fill="currentColor"/></svg>
-        </span>
-      </div>
+  <div id="phone">
       <div class="appbar">
         <span class="app-logo"><b>The</b> Longest Round</span>
         <span class="sync-pill"><i class="dot"></i>Synced 6m ago</span>
@@ -584,18 +515,6 @@
       </nav>
       <div class="home-indicator"></div>
     </div>
-  </div>
-
-  <div class="tab-preview" id="tabPreview">
-    <button class="preview-btn active" data-target="today" type="button">Today</button>
-    <button class="preview-btn" data-target="log" type="button">Log</button>
-    <button class="preview-btn" data-target="insights" type="button">Insights</button>
-    <button class="preview-btn" data-target="connect" type="button">Connect</button>
-  </div>
-
-  <footer class="chrome-bottom" id="chromeBottom">
-    <p class="caption">Every number on this screen is read from one root record set — guests, route stops, rituals, and daily entries — the same shape a Sanity dataset would return, so nothing here is entered twice.</p>
-  </footer>
 </div>
 
 <script>
@@ -605,18 +524,6 @@ function boot(sanityData){
   var today = new Date(); today.setHours(0,0,0,0);
   function addDays(n){ var d = new Date(today); d.setDate(d.getDate()+n); return d; }
   var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-  /* ---- Stars ---- */
-  var starField = document.getElementById('stars');
-  for (var i=0;i<46;i++){
-    var s = document.createElement('div');
-    s.className='star';
-    s.style.left = (Math.random()*100)+'%';
-    s.style.top = (Math.random()*55)+'%';
-    s.style.animationDelay = (Math.random()*4)+'s';
-    s.style.width = s.style.height = (Math.random()*1.6+1)+'px';
-    starField.appendChild(s);
-  }
 
   var TOTAL_TARGET_MILES = 1800;
 
@@ -642,6 +549,28 @@ function boot(sanityData){
     if (!e.journal) e.journal = '';
     if (!e.insightOverride) e.insightOverride = '';
   });
+
+  // Ritual completion lives in localStorage so users can tick them off in-app
+  var RITUAL_STORAGE_KEY = 'tlr-rituals';
+  function getRitualState(){
+    try { return JSON.parse(localStorage.getItem(RITUAL_STORAGE_KEY)) || {}; } catch(e){ return {}; }
+  }
+  function saveRitualState(state){
+    try { localStorage.setItem(RITUAL_STORAGE_KEY, JSON.stringify(state)); } catch(e){}
+  }
+  function isRitualDone(day, ritualId){
+    var state = getRitualState();
+    return state[day] && state[day].indexOf(ritualId) > -1;
+  }
+  function toggleRitual(day, ritualId){
+    var state = getRitualState();
+    if (!state[day]) state[day] = [];
+    var idx = state[day].indexOf(ritualId);
+    if (idx > -1) state[day].splice(idx, 1);
+    else state[day].push(ritualId);
+    saveRitualState(state);
+  }
+
   GUESTS.forEach(function(g){
     var stopByOrder = function(o){ return ROUTE_STOPS.find(function(s){ return s.order===o; }); };
     var fromS = stopByOrder(g.fromStop), toS = stopByOrder(g.toStop);
@@ -787,7 +716,7 @@ function boot(sanityData){
     var list = document.getElementById('ritualList');
     list.innerHTML = '';
     RITUALS.slice().sort(function(a,b){return a.order-b.order;}).forEach(function(rit){
-      var done = TODAY_ENTRY.ritualsCompleted.indexOf(rit.id) > -1;
+      var done = isRitualDone(TODAY_ENTRY.day, rit.id);
       var li = document.createElement('li');
       li.className = done ? 'done' : '';
       li.dataset.ritual = rit.id;
@@ -809,21 +738,22 @@ function boot(sanityData){
   }
   document.getElementById('ritualList').addEventListener('click', function(e){
     var li = e.target.closest('li');
-    if(li){ li.classList.toggle('done'); updateRitualCount(); }
+    if(li){
+      li.classList.toggle('done');
+      toggleRitual(TODAY_ENTRY.day, li.dataset.ritual);
+      updateRitualCount();
+    }
   });
 
   /* ---- Screen switching ---- */
   var screens = document.querySelectorAll('.screen');
   var tabs = document.querySelectorAll('.tab');
-  var previewBtns = document.querySelectorAll('.preview-btn');
   function showScreen(name){
     screens.forEach(function(sc){ sc.classList.toggle('active', sc.dataset.screen===name); });
     tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.target===name); });
-    previewBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.target===name); });
     if(name==='today' && currentRiderId==='darren') animateScore();
   }
   tabs.forEach(function(t){ t.addEventListener('click', function(){ showScreen(t.dataset.target); }); });
-  previewBtns.forEach(function(b){ b.addEventListener('click', function(){ showScreen(b.dataset.target); }); });
 
   /* ---- Journey countdown ring + count-up ---- */
   var ring = document.getElementById('ringValue');
@@ -853,10 +783,12 @@ function boot(sanityData){
 
   /* ---- Log: heatmap (ritual density per day, all logged days) ---- */
   var grid = document.getElementById('heatmapGrid');
+  var ritStateHeatmap = getRitualState();
   DAILY_ENTRIES.forEach(function(e){
     var cell = document.createElement('div');
     cell.className='cell';
-    var intensity = e.ritualsCompleted.length / RITUALS.length;
+    var dayRitualsHeatmap = ritStateHeatmap[e.day] || [];
+    var intensity = dayRitualsHeatmap.length / RITUALS.length;
     cell.style.background = intensity>0 ? 'color-mix(in srgb, var(--ember) '+Math.round(intensity*100)+'%, var(--surface-raised))' : 'var(--surface-raised)';
     grid.appendChild(cell);
   });
@@ -872,7 +804,8 @@ function boot(sanityData){
   /* ---- Log: Summary tiles ---- */
   (function(){
     var avgMiles = Math.round(totalCycled/DAILY_ENTRIES.length);
-    var totalRituals = DAILY_ENTRIES.reduce(function(a,e){return a+e.ritualsCompleted.length;},0);
+    var ritStateSummary = getRitualState();
+    var totalRituals = DAILY_ENTRIES.reduce(function(a,e){var dr=ritStateSummary[e.day]||[];return a+dr.length;},0);
     var ritualPct = Math.round(totalRituals/(DAILY_ENTRIES.length*RITUALS.length)*100);
     var swimStops = ROUTE_STOPS.filter(function(s){ return s.type==='swim'; });
     var swimsDone = swimStops.filter(function(s){ return s.arrivalOffsetDays<=0; }).length;
@@ -895,7 +828,7 @@ function boot(sanityData){
   (function(){
     var logList = document.getElementById('logList');
     DAILY_ENTRIES.slice().reverse().forEach(function(e){
-      var dots = RITUALS.map(function(r){ return '<span class="'+(e.ritualsCompleted.indexOf(r.id)>-1?'on':'')+'"></span>'; }).join('');
+      var dots = RITUALS.map(function(r){ return '<span class="'+(isRitualDone(e.day,r.id)?'on':'')+'"></span>'; }).join('');
       var row = document.createElement('div');
       row.className = 'log-row';
       var sleepLabel = Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m';
@@ -909,7 +842,7 @@ function boot(sanityData){
       row.innerHTML =
         '<div class="log-date"><span class="log-day">'+e.date.getDate()+'</span><span class="log-mon">'+MONTHS[e.date.getMonth()]+'</span></div>'+
         '<div class="log-mid"><span class="log-score">'+distLabel+(e===TODAY_ENTRY?' · Today':'')+photoBadge+'</span>'+
-        '<span class="log-meta">'+sleepLabel+' sleep · '+e.recoveryScore+'% recovery · '+e.ritualsCompleted.length+'/'+RITUALS.length+' rituals'+guestNote+'</span></div>'+
+        '<span class="log-meta">'+sleepLabel+' sleep · '+e.recoveryScore+'% recovery · '+(getRitualState()[e.day]||[]).length+'/'+RITUALS.length+' rituals'+guestNote+'</span></div>'+
         '<div class="log-dots">'+dots+'</div>';
       row.addEventListener('click', function(){ openDaySheet(e); });
       logList.appendChild(row);
@@ -1008,8 +941,9 @@ function boot(sanityData){
     if (overridden){
       text = overridden.insightOverride;
     } else {
-      var high = DAILY_ENTRIES.filter(function(e){ return e.ritualsCompleted.length >= 3; });
-      var low = DAILY_ENTRIES.filter(function(e){ return e.ritualsCompleted.length < 3; });
+      var ritStateInsight = getRitualState();
+      var high = DAILY_ENTRIES.filter(function(e){ return (ritStateInsight[e.day]||[]).length >= 3; });
+      var low = DAILY_ENTRIES.filter(function(e){ return (ritStateInsight[e.day]||[]).length < 3; });
       var avg = function(list){ return list.reduce(function(a,e){return a+e.cyclingMiles;},0) / (list.length||1); };
       if (high.length && low.length){
         var diff = Math.round(avg(high) - avg(low));
@@ -1048,7 +982,7 @@ function boot(sanityData){
     var list = document.getElementById('sheetRitualList');
     list.innerHTML = '';
     RITUALS.slice().sort(function(a,b){return a.order-b.order;}).forEach(function(rit){
-      var done = entry.ritualsCompleted.indexOf(rit.id) > -1;
+      var done = isRitualDone(entry.day, rit.id);
       var li = document.createElement('li');
       li.className = done ? 'done' : '';
       li.style.cursor = 'default';
@@ -1084,14 +1018,6 @@ function boot(sanityData){
     wahooStatus.textContent = wahooConnected ? 'Connected' : 'Not connected';
     wahooCopy.textContent = wahooConnected ? 'Synced just now' : 'Connect a Wahoo bike computer to auto-log daily cycling distance.';
     wahooBtn.textContent = wahooConnected ? 'Disconnect' : 'Connect';
-  });
-
-  /* ---- Screenshot mode ---- */
-  var stage = document.getElementById('stage');
-  var chromeToggle = document.getElementById('chromeToggle');
-  chromeToggle.addEventListener('click', function(){
-    var on = stage.classList.toggle('screenshot-mode');
-    chromeToggle.setAttribute('aria-pressed', on);
   });
 
   /* ---- Init ---- */
