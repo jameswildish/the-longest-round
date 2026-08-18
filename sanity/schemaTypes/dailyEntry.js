@@ -70,18 +70,6 @@ export default defineType({
       description: 'Leave empty on solo days — the app and site both show a "solo leg" state automatically.',
     }),
     defineField({
-      name: 'ridingTodayNote',
-      title: 'Riding Today — Note Override',
-      type: 'string',
-      description: 'Optional. Overrides the guest\'s default role text for this specific day.',
-    }),
-    defineField({
-      name: 'dayDescription',
-      title: 'Day Description',
-      type: 'text',
-      description: 'Darren\'s summary of the day — shown as the main description on the app and website.',
-    }),
-    defineField({
       name: 'journal',
       title: "Darren's Journal",
       type: 'text',
@@ -97,20 +85,6 @@ export default defineType({
       title: '"What\'s Driving It" Override',
       type: 'text',
       description: 'Written by an editor, or by an automated job reading this same data. Shown in place of the computed ritual/mileage line whenever it\'s filled in - leave blank to let it compute automatically.',
-    }),
-    defineField({
-      name: 'currentLat',
-      title: 'Current Latitude',
-      type: 'number',
-      description: 'Darren\'s GPS latitude at end of day. Used to place the live dot on the map.',
-      validation: (r) => r.min(-90).max(90),
-    }),
-    defineField({
-      name: 'currentLng',
-      title: 'Current Longitude',
-      type: 'number',
-      description: 'Darren\'s GPS longitude at end of day. Used to place the live dot on the map.',
-      validation: (r) => r.min(-180).max(180),
     }),
   ],
   orderings: [

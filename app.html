@@ -700,7 +700,7 @@ function boot(sanityData){
     var last7 = DAILY_ENTRIES.slice(-7);
     var avg7 = Math.round(last7.reduce(function(a,e){return a+e.cyclingMiles;},0)/last7.length);
     document.getElementById('leadInsight').textContent =
-      TODAY_ENTRY.dayDescription || (totalCycled + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDoneInsight + ' of 2 swims complete.');
+      totalCycled + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDoneInsight + ' of 2 swims complete.';
 
     var grid = document.getElementById('todayMetricGrid');
     var swimsDoneEntries = DAILY_ENTRIES.filter(function(e){ return e.swimmingMiles > 0; }).length;
@@ -720,7 +720,7 @@ function boot(sanityData){
       guestCard.style.display = 'flex';
       guestCard.innerHTML =
         '<span class="rider-avatar">'+gAvatar+'</span>'+
-        '<div class="guest-copy"><span class="section-label">Joining Me Today</span><div class="name">'+g.name+'</div><div class="role">'+(TODAY_ENTRY.ridingTodayNote||g.role)+'</div></div>';
+        '<div class="guest-copy"><span class="section-label">Joining Me Today</span><div class="name">'+g.name+'</div><div class="role">'+(g.role||'')+'</div></div>';
     } else {
       guestCard.style.display = 'none';
     }
@@ -972,7 +972,7 @@ function boot(sanityData){
       var g = GUESTS.find(function(x){ return x.id===entry.ridingTodayGuestId; });
       guestCard.style.display = 'flex';
       var sheetAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
-      guestCard.innerHTML = '<span class="rider-avatar">'+sheetAvatar+'</span><div class="guest-copy"><span class="section-label">Joined By</span><div class="name">'+g.name+'</div><div class="role">'+(entry.ridingTodayNote||g.role)+'</div></div>';
+      guestCard.innerHTML = '<span class="rider-avatar">'+sheetAvatar+'</span><div class="guest-copy"><span class="section-label">Joined By</span><div class="name">'+g.name+'</div><div class="role">'+(g.role||'')+'</div></div>';
     } else {
       guestCard.style.display = 'none';
     }
@@ -1045,7 +1045,7 @@ function boot(sanityData){
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,role,"profilePic":profilePic.asset->url}',
       guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,role,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,dayDescription,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,currentLat,currentLng,avgHeartRate,avgHRV}'
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),
