@@ -4,8 +4,8 @@
   "description": "Track Darren Barker's 1,800-mile cycling and open-water swimming challenge from Edinburgh to Morocco",
   "start_url": "/app.html",
   "display": "standalone",
-  "background_color": "#14130f",
-  "theme_color": "#14130f",
+  "background_color": "#151515",
+  "theme_color": "#151515",
   "orientation": "portrait",
   "icons": [
     {
