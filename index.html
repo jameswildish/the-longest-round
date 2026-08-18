@@ -69,9 +69,10 @@
 
   /* ---- Sponsors / Partners ---- */
   .sponsors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:24px;align-items:center;justify-items:center;margin-top:32px;}
-  .sponsor-card{display:flex;align-items:center;justify-content:center;padding:16px;background:var(--surface);border:1px solid var(--hairline);border-radius:12px;transition:border-color .2s;}
+  .sponsor-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;background:var(--surface);border:1px solid var(--hairline);border-radius:12px;transition:border-color .2s;text-decoration:none;}
   .sponsor-card:hover{border-color:var(--ember);}
-  .sponsor-card img{max-width:100%;max-height:56px;object-fit:contain;}
+  .sponsor-card img{max-width:100%;max-height:80px;object-fit:contain;}
+  .sponsor-card .sponsor-name{font-size:11px;color:var(--ink-faint);font-weight:600;text-align:center;letter-spacing:0.02em;}
 
   /* ---- Hero ---- */
   .hero{position:relative;padding:clamp(60px,12vh,120px) 0 clamp(56px,10vh,100px);overflow:hidden;text-align:center;}
@@ -260,8 +261,8 @@
     .ig-cta{flex-direction:column;gap:12px;}
     .ig-profile{padding:14px 18px;}
     .sponsors-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:14px;}
-    .sponsor-card{padding:12px;}
-    .sponsor-card img{max-height:40px;}
+    .sponsor-card{padding:14px;}
+    .sponsor-card img{max-height:60px;}
     .archive-list .day-detail{padding:16px;}
     .stat-tile{padding:10px;}
     .site-footer{padding:24px 0 40px;}
@@ -502,7 +503,7 @@
 
 <footer class="site-footer">
   <div class="wrap">
-    <p>Copyright 2026 thelongestround.</p>
+    <p>&copy; 2026 thelongestround.</p>
   </div>
 </footer>
 
@@ -917,8 +918,8 @@ function boot(sanityData){
         var grid = document.getElementById('sponsorsGrid');
         grid.innerHTML = sponsors.map(function(s){
           var inner = s.logo
-            ? '<img src="'+s.logo+'" alt="'+s.name+'">'
-            : '<span style="font-size:13px;color:var(--ink-faint);font-weight:600;">'+s.name+'</span>';
+            ? '<img src="'+s.logo+'" alt="'+s.name+'"><span class="sponsor-name">'+s.name+'</span>'
+            : '<span class="sponsor-name" style="font-size:13px;">'+s.name+'</span>';
           return s.url
             ? '<a class="sponsor-card" href="'+s.url+'" target="_blank" rel="noopener">'+inner+'</a>'
             : '<div class="sponsor-card">'+inner+'</div>';
