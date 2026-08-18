@@ -286,7 +286,7 @@
     <a href="#journey">The Route</a>
     <a href="#latest">Latest Update</a>
     <a href="#progress">Progress</a>
-    <a href="#riders">The Riders</a>
+    <a href="#riders">The Team</a>
     <a href="#archive">Journey Archive</a>
     <a href="#cause">Why This Ride</a>
     <a href="#sponsors">Sponsors &amp; Partners</a>
@@ -450,9 +450,9 @@ document.getElementById('siteNav').addEventListener('click',function(e){
 
 <section class="section reveal" id="riders">
   <div class="wrap">
-    <span class="eyebrow">The Riders</span>
-    <h2>One lead, six guests, ten stages</h2>
-    <p class="section-sub">High-profile names join Darren for a leg of the route each - tap through the app to see any rider's own overview.</p>
+    <span class="eyebrow">The Team</span>
+    <h2>Names who have joined me on The Longest Round</h2>
+    <p class="section-sub">Friends, supporters and fellow athletes join Darren for a leg, or part of a leg, across the route. Check the app for each participant's overview.</p>
     <div class="rider-grid" id="riderGrid"></div>
   </div>
 </section>
@@ -461,7 +461,7 @@ document.getElementById('siteNav').addEventListener('click',function(e){
   <div class="wrap">
     <span class="eyebrow">Journey Archive</span>
     <h2>Every day, logged</h2>
-    <p class="section-sub">Every recorded day of the expedition - expand any entry for the full detail.</p>
+    <p class="section-sub">A day-by-day record of The Longest Round. Tap any entry to see the full breakdown.</p>
     <div class="archive-list" id="archiveList"></div>
   </div>
 </section>
@@ -930,20 +930,28 @@ function boot(sanityData){
       var photoBlock = e.journalPhoto ? '<div class="archive-photo"><img src="'+e.journalPhoto+'?w=800&auto=format" alt="Journal photo" style="width:100%;height:auto;display:block;"></div>' : '';
       var det = document.createElement('details');
       det.className = 'day-entry';
+      var sumParts = [];
+      if (e.recoveryScore) sumParts.push(e.recoveryScore+'% recovery');
+      sumParts.push(e.ritualsCompleted.length+'/'+RITUALS.length+' sisu rituals');
       det.innerHTML =
         '<summary>'+
           '<span class="sum-date">'+MONTHS[e.date.getMonth()]+' '+e.date.getDate()+'</span>'+
           '<span class="sum-dist">'+distLabel+(e===TODAY_ENTRY?' · Today':'')+photoBadge+'</span>'+
-          '<span class="sum-meta">'+sleepLabel+' sleep · '+e.recoveryScore+'% recovery · '+e.ritualsCompleted.length+'/'+RITUALS.length+' rituals</span>'+
+          '<span class="sum-meta">'+sumParts.join(' · ')+'</span>'+
           '<svg class="sum-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>'+
-        '</summary>'+
+        '</summary>';
+      var detailTiles = '';
+      if (e.cyclingMiles) detailTiles += '<div class="stat-tile"><span class="stat-label">Cycling</span><span class="stat-value">'+e.cyclingMiles+' mi</span></div>';
+      if (e.swimmingMiles) detailTiles += '<div class="stat-tile"><span class="stat-label">Swimming</span><span class="stat-value">'+e.swimmingMiles+' mi</span></div>';
+      if (e.recoveryScore) detailTiles += '<div class="stat-tile"><span class="stat-label">Recovery</span><span class="stat-value">'+e.recoveryScore+'%</span></div>';
+      if (e.sleepMinutes) detailTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+sleepLabel+'</span></div>';
+      if (e.avgHeartRate) detailTiles += '<div class="stat-tile"><span class="stat-label">Avg HR</span><span class="stat-value">'+e.avgHeartRate+' bpm</span></div>';
+      if (e.avgHRV) detailTiles += '<div class="stat-tile"><span class="stat-label">Avg HRV</span><span class="stat-value">'+e.avgHRV+' ms</span></div>';
+      detailTiles += guestLine;
+      det.innerHTML +=
         '<div class="day-detail">'+
           '<div class="stat-grid">'+
-            '<div class="stat-tile"><span class="stat-label">Cycling</span><span class="stat-value">'+e.cyclingMiles+' mi</span></div>'+
-            '<div class="stat-tile"><span class="stat-label">Swimming</span><span class="stat-value">'+(e.swimmingMiles>0?e.swimmingMiles+' mi':'-')+'</span></div>'+
-            '<div class="stat-tile"><span class="stat-label">Recovery</span><span class="stat-value">'+e.recoveryScore+'%</span></div>'+
-            '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+sleepLabel+'</span></div>'+
-            guestLine+
+            detailTiles+
           '</div>'+
           '<div>'+
             photoBlock+
