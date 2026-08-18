@@ -8,6 +8,7 @@ export default defineConfig({
   title: 'The Longest Round',
   projectId: 'b5y3kr24',
   dataset: 'production',
+  basePath: '/studio',
   plugins: [structureTool(), visionTool()],
   schema: {
     types: schemaTypes,
