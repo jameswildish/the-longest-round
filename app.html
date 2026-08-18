@@ -570,6 +570,7 @@ function boot(sanityData){
     var stopByOrder = function(o){ return ROUTE_STOPS.find(function(s){ return s.order===o; }); };
     var fromS = stopByOrder(g.fromStop), toS = stopByOrder(g.toStop);
     g.stage = (g.fromStopName || (fromS&&fromS.name) || '') + ' → ' + (g.toStopName || (toS&&toS.name) || '');
+    g.stageComplete = DAILY_ENTRIES.some(function(e){ return e.ridingTodayGuestId === g.id && e.stageComplete; });
     g.contribPct = g.miles ? Math.round((g.miles/TOTAL_TARGET_MILES)*1000)/10 : 0;
     if (typeof g.duration !== 'string' && g.durationMinutes){
       var gh=Math.floor(g.durationMinutes/60), gm=g.durationMinutes%60;
@@ -1031,8 +1032,8 @@ function boot(sanityData){
       routeStops: '*[_type=="routeStop"]|order(order asc){order,name,type,"arrivalTime":arrivalTime,lat,lng}',
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,"profilePic":profilePic.asset->url}',
-      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,stageComplete,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}'
+      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,stageComplete,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),
