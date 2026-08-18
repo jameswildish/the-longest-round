@@ -761,6 +761,8 @@ function boot(sanityData){
     if (TODAY_ENTRY.swimmingMiles) statTiles += '<div class="stat-tile"><span class="stat-label">Swimming Today</span><span class="stat-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
     if (TODAY_ENTRY.recoveryScore) statTiles += '<div class="stat-tile"><span class="stat-label">Recovery</span><span class="stat-value">'+TODAY_ENTRY.recoveryScore+'%</span></div>';
     if (TODAY_ENTRY.sleepMinutes) statTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m</span></div>';
+    if (TODAY_ENTRY.avgHeartRate) statTiles += '<div class="stat-tile"><span class="stat-label">Avg HR</span><span class="stat-value">'+TODAY_ENTRY.avgHeartRate+' bpm</span></div>';
+    if (TODAY_ENTRY.avgHRV) statTiles += '<div class="stat-tile"><span class="stat-label">Avg HRV</span><span class="stat-value">'+TODAY_ENTRY.avgHRV+' ms</span></div>';
     document.getElementById('latestStats').innerHTML = statTiles;
 
     var ritualsEl = document.getElementById('latestRituals');
@@ -851,6 +853,18 @@ function boot(sanityData){
       best('recoveryScore','Peak Recovery', function(e){ return e.recoveryScore+'%'; }),
       best('sleepMinutes','Best Sleep', function(e){ return Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m'; })
     ];
+    var avgMiles = Math.round(totalCycled / DAILY_ENTRIES.length);
+    bests.push({label:'Avg Daily Miles', value:avgMiles+' mi'});
+    var hrEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHeartRate; });
+    if (hrEntries.length) {
+      var avgHR = Math.round(hrEntries.reduce(function(a,e){return a+e.avgHeartRate;},0)/hrEntries.length);
+      bests.push({label:'Avg HR', value:avgHR+' bpm'});
+    }
+    var hrvEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHRV; });
+    if (hrvEntries.length) {
+      var avgHRV = Math.round(hrvEntries.reduce(function(a,e){return a+e.avgHRV;},0)/hrvEntries.length);
+      bests.push({label:'Avg HRV', value:avgHRV+' ms'});
+    }
     document.getElementById('bestsRow').innerHTML = bests.map(function(b){ return '<div class="best-mini"><span class="v">'+b.value+'</span><span class="l">'+b.label+'</span></div>'; }).join('');
 
     var overridden = DAILY_ENTRIES.slice().reverse().find(function(e){ return e.insightOverride; });
@@ -973,7 +987,7 @@ function boot(sanityData){
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,role,"profilePic":profilePic.asset->url}',
       guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,role,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,dayDescription,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,currentLat,currentLng}'
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,dayDescription,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,currentLat,currentLng,avgHeartRate,avgHRV}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),

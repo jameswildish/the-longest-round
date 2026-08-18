@@ -43,6 +43,20 @@ export default defineType({
       type: 'number',
     }),
     defineField({
+      name: 'avgHeartRate',
+      title: 'Avg Heart Rate (bpm)',
+      type: 'number',
+      description: 'Average heart rate for the day from BiotrackOS or manual entry.',
+      validation: (r) => r.min(30).max(220),
+    }),
+    defineField({
+      name: 'avgHRV',
+      title: 'Avg HRV (ms)',
+      type: 'number',
+      description: 'Average heart rate variability for the day.',
+      validation: (r) => r.min(0).max(300),
+    }),
+    defineField({
       name: 'ritualsCompleted',
       title: 'Rituals Completed',
       type: 'array',
