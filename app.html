@@ -204,8 +204,6 @@
   .source-sync{font-size:12px;color:var(--ink-faint);margin:0 0 10px;}
   .chip-row{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:14px;}
   .chip{font-size:10.5px;color:var(--ink-dim);background:var(--surface-raised);border:1px solid var(--hairline);padding:5px 10px;border-radius:999px;}
-  .connect-btn{width:100%;margin-bottom:14px;background:transparent;border:1px solid var(--ember);color:var(--ember-strong);padding:11px;border-radius:12px;font-size:12.5px;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;cursor:pointer;transition:all .2s ease;}
-  .connect-btn:hover{background:var(--ember-dim);}
   .footnote{font-size:11px;line-height:1.6;color:var(--ink-faint);padding:2px 2px 4px;}
 
   .log-row{cursor:pointer;}
@@ -440,24 +438,26 @@
 
           <div class="source-card connected">
             <div class="source-head">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21"/></svg>
+              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTEiIGZpbGw9IiNFMTExMkMiLz48cGF0aCBkPSJNMTIgMTIuNmMyLjIgMCA0LjgtLjIgNi4yLS42LjIgMCAuMy4xLjMuMyAwIC4xLS4xLjMtLjMuMy0xLjQuNC00IC42LTYuMi42IiBmaWxsPSIjOUIwQzIwIi8+PHJlY3QgeD0iNS41IiB5PSIxMCIgd2lkdGg9IjguNSIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==" alt="Polar" style="width:24px;height:24px;border-radius:50%;">
               <span>Polar</span>
               <span class="status-pill connected">Connected</span>
             </div>
-            <p class="source-sync">Synced 6 minutes ago</p>
+            <p class="source-sync">Synced via BiotrackOS</p>
             <div class="chip-row">
-              <span class="chip">Heart Rate</span><span class="chip">HRV</span><span class="chip">Sleep</span><span class="chip">Recovery</span><span class="chip">Swim Sessions</span>
+              <span class="chip">Heart Rate</span><span class="chip">Heart Rate Variability</span><span class="chip">Sleep</span>
             </div>
           </div>
 
-          <div class="source-card" id="wahooCard">
+          <div class="source-card connected">
             <div class="source-head">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="17" r="3.2"/><circle cx="18" cy="17" r="3.2"/><path d="M6 17 10 8h5l3 9M10 8 8.5 5H6M13 8l2.5 4.5H18"/></svg>
+              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iNCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjEyIiB5PSIxNC41IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iNiIgZmlsbD0iI2ZmZiIgbGV0dGVyLXNwYWNpbmc9Ii0wLjIiPndhaG9vPC90ZXh0Pjwvc3ZnPg==" alt="Wahoo" style="width:24px;height:24px;border-radius:6px;">
               <span>Wahoo</span>
-              <span class="status-pill" id="wahooStatus">Not connected</span>
+              <span class="status-pill connected">Connected</span>
             </div>
-            <p class="source-sync" id="wahooCopy">Connect a Wahoo bike computer to auto-log daily cycling distance.</p>
-            <button class="connect-btn" id="wahooConnectBtn" type="button">Connect</button>
+            <p class="source-sync">Synced via BiotrackOS</p>
+            <div class="chip-row">
+              <span class="chip">Cycling Distance</span><span class="chip">Speed</span><span class="chip">Duration</span>
+            </div>
           </div>
 
           <p class="footnote">Live sync runs through The Sixth House Health Bridge supported by BiotrackOS, so data can be ingested automatically from connected devices.</p>
@@ -993,20 +993,6 @@ function boot(sanityData){
   document.getElementById('sheetClose').addEventListener('click', closeDaySheet);
   document.getElementById('sheetBackdrop').addEventListener('click', closeDaySheet);
 
-  /* ---- Wahoo connect toggle ---- */
-  var wahooBtn = document.getElementById('wahooConnectBtn');
-  var wahooCard = document.getElementById('wahooCard');
-  var wahooStatus = document.getElementById('wahooStatus');
-  var wahooCopy = document.getElementById('wahooCopy');
-  var wahooConnected = false;
-  wahooBtn.addEventListener('click', function(){
-    wahooConnected = !wahooConnected;
-    wahooCard.classList.toggle('connected', wahooConnected);
-    wahooStatus.classList.toggle('connected', wahooConnected);
-    wahooStatus.textContent = wahooConnected ? 'Connected' : 'Not connected';
-    wahooCopy.textContent = wahooConnected ? 'Synced just now' : 'Connect a Wahoo bike computer to auto-log daily cycling distance.';
-    wahooBtn.textContent = wahooConnected ? 'Disconnect' : 'Connect';
-  });
 
   /* ---- Init ---- */
   renderRiderStrip();
