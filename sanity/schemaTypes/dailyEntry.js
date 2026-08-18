@@ -82,7 +82,21 @@ export default defineType({
       name: 'insightOverride',
       title: '"What\'s Driving It" Override',
       type: 'text',
-      description: 'Written by an editor, or by an automated job reading this same data. Shown in place of the computed ritual/mileage line whenever it\'s filled in — leave blank to let it compute automatically.',
+      description: 'Written by an editor, or by an automated job reading this same data. Shown in place of the computed ritual/mileage line whenever it\'s filled in - leave blank to let it compute automatically.',
+    }),
+    defineField({
+      name: 'currentLat',
+      title: 'Current Latitude',
+      type: 'number',
+      description: 'Darren\'s GPS latitude at end of day. Used to place the live dot on the map.',
+      validation: (r) => r.min(-90).max(90),
+    }),
+    defineField({
+      name: 'currentLng',
+      title: 'Current Longitude',
+      type: 'number',
+      description: 'Darren\'s GPS longitude at end of day. Used to place the live dot on the map.',
+      validation: (r) => r.min(-180).max(180),
     }),
   ],
   orderings: [

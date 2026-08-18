@@ -1069,7 +1069,7 @@ function boot(sanityData){
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,role,"profilePic":profilePic.asset->url}',
       guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,role,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,dayDescription,journal,"journalPhoto":journalPhoto.asset->url,insightOverride}'
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,dayDescription,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,currentLat,currentLng}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),
