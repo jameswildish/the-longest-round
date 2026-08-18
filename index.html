@@ -982,7 +982,7 @@ function boot(sanityData){
   var SANITY_API_VERSION = 'v2024-01-01';
 
   function sanityQuery(groq){
-    var url = 'https://'+SANITY_PROJECT_ID+'.apicdn.sanity.io/'+SANITY_API_VERSION+'/data/query/'+SANITY_DATASET+'?query='+encodeURIComponent(groq);
+    var url = 'https://'+SANITY_PROJECT_ID+'.api.sanity.io/'+SANITY_API_VERSION+'/data/query/'+SANITY_DATASET+'?query='+encodeURIComponent(groq);
     return fetch(url).then(function(res){
       if (!res.ok) throw new Error('Sanity query failed: '+res.status);
       return res.json();
