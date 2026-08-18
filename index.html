@@ -46,13 +46,18 @@
   .social-links a:hover{color:var(--ember);}
   .social-links svg{width:18px;height:18px;}
 
-  /* ---- Instagram Feed ---- */
-  .ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:28px;}
-  .ig-card{position:relative;display:block;border-radius:14px;overflow:hidden;aspect-ratio:1;background:var(--surface);}
-  .ig-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease;}
-  .ig-card:hover img{transform:scale(1.04);}
-  .ig-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.15);opacity:0;transition:opacity .3s ease;}
-  .ig-card:hover .ig-overlay{opacity:1;}
+  /* ---- Instagram ---- */
+  .ig-cta{display:flex;flex-direction:column;align-items:center;gap:24px;margin-top:32px;text-align:center;}
+  .ig-profile{display:flex;align-items:center;gap:16px;padding:20px 28px;background:var(--surface);border:1px solid var(--hairline);border-radius:16px;text-decoration:none;color:var(--ink);transition:border-color .2s ease,transform .2s ease;}
+  .ig-profile:hover{border-color:var(--ember);transform:translateY(-2px);}
+  .ig-profile-icon{width:52px;height:52px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;flex:none;}
+  .ig-profile-icon svg{width:28px;height:28px;color:#fff;}
+  .ig-profile-info{text-align:left;}
+  .ig-profile-handle{font-size:15px;font-weight:700;color:var(--ink);}
+  .ig-profile-label{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+  .ig-follow-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;border-radius:999px;text-decoration:none;transition:transform .2s ease,box-shadow .2s ease;}
+  .ig-follow-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(220,39,67,0.3);}
+  .ig-follow-btn svg{width:18px;height:18px;}
 
   /* ---- Hero ---- */
   .hero{position:relative;padding:clamp(60px,12vh,120px) 0 clamp(56px,10vh,100px);overflow:hidden;text-align:center;}
@@ -395,8 +400,24 @@
   <div class="wrap">
     <span class="eyebrow">Follow The Journey</span>
     <h2>On Instagram</h2>
-    <p class="section-sub">Live updates from the road — follow <a href="https://www.instagram.com/thelongestroundchallenge/" target="_blank" rel="noopener" style="color:var(--ember);">@thelongestroundchallenge</a> and <a href="https://www.instagram.com/mrdfbarker/" target="_blank" rel="noopener" style="color:var(--ember);">@mrdfbarker</a></p>
-    <div class="ig-grid" id="igGrid"></div>
+    <p class="section-sub">Live updates, behind-the-scenes footage, and daily check-ins from the road.</p>
+    <div class="ig-cta">
+      <a class="ig-profile" href="https://www.instagram.com/thelongestroundchallenge/" target="_blank" rel="noopener">
+        <span class="ig-profile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></span>
+        <div class="ig-profile-info">
+          <div class="ig-profile-handle">@thelongestroundchallenge</div>
+          <div class="ig-profile-label">The Longest Round — official updates</div>
+        </div>
+      </a>
+      <a class="ig-profile" href="https://www.instagram.com/mrdfbarker/" target="_blank" rel="noopener">
+        <span class="ig-profile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></span>
+        <div class="ig-profile-info">
+          <div class="ig-profile-handle">@mrdfbarker</div>
+          <div class="ig-profile-label">Darren Barker — personal</div>
+        </div>
+      </a>
+      <a class="ig-follow-btn" href="https://www.instagram.com/thelongestroundchallenge/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Follow on Instagram</a>
+    </div>
   </div>
 </section>
 
@@ -763,36 +784,6 @@ function boot(sanityData){
     });
   })();
 
-  /* ---- Instagram Feed (dynamic via Graph API) ---- */
-  (function(){
-    var token = sanityData.instagramToken;
-    var grid = document.getElementById('igGrid');
-    if (!token) {
-      grid.innerHTML = '<p style="color:var(--ink-faint);font-size:13px;">Instagram feed will appear here once the access token is added in <a href="/studio" style="color:var(--ember);">Site Config</a>.</p>';
-      return;
-    }
-    fetch('https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=6&access_token='+encodeURIComponent(token))
-      .then(function(res){ return res.json(); })
-      .then(function(json){
-        if (json.error) { grid.innerHTML = '<p style="color:var(--ink-faint);font-size:13px;">Instagram token expired — update it in <a href="/studio" style="color:var(--ember);">Site Config</a>.</p>'; return; }
-        var posts = json.data || [];
-        if (!posts.length) { grid.innerHTML = '<p style="color:var(--ink-faint);font-size:13px;">No posts found.</p>'; return; }
-        posts.forEach(function(p){
-          var imgSrc = p.media_type === 'VIDEO' ? p.thumbnail_url : p.media_url;
-          if (!imgSrc) return;
-          var card = document.createElement('a');
-          card.href = p.permalink;
-          card.target = '_blank';
-          card.rel = 'noopener';
-          card.className = 'ig-card';
-          var caption = p.caption ? p.caption.substring(0, 120) + (p.caption.length > 120 ? '…' : '') : '';
-          card.innerHTML = '<img src="'+imgSrc+'" alt="'+(caption.replace(/"/g,'&quot;'))+'" loading="lazy"><div class="ig-overlay">'+(p.media_type==='VIDEO'?'<svg viewBox="0 0 24 24" fill="white" style="width:32px;height:32px;"><polygon points="6,4 20,12 6,20"/></svg>':'')+'</div>';
-          grid.appendChild(card);
-        });
-      })
-      .catch(function(){ grid.innerHTML = '<p style="color:var(--ink-faint);font-size:13px;">Could not load Instagram feed.</p>'; });
-  })();
-
   /* ---- Scroll reveal ---- */
   if ('IntersectionObserver' in window && !reduced){
     var io = new IntersectionObserver(function(entries){
@@ -825,21 +816,18 @@ function boot(sanityData){
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,role,"profilePic":profilePic.asset->url}',
       guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,role,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,dayDescription,journal,"journalPhoto":journalPhoto.asset->url,insightOverride}',
-      siteConfig: '*[_type=="siteConfig"][0]{instagramToken}'
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,dayDescription,journal,"journalPhoto":journalPhoto.asset->url,insightOverride}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),
       sanityQuery(queries.rituals),
       sanityQuery(queries.guests),
       sanityQuery(queries.dailyEntries),
-      sanityQuery(queries.lead),
-      sanityQuery(queries.siteConfig)
+      sanityQuery(queries.lead)
     ]).then(function(results){
       var dailyEntries = results[3];
       var leadDoc = results[4];
-      var config = results[5];
-      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries||[], lead:(leadDoc&&leadDoc[0])||null, instagramToken:(config&&config.instagramToken)||''};
+      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries||[], lead:(leadDoc&&leadDoc[0])||null};
     }).catch(function(err){
       console.warn('[The Longest Round] Sanity fetch failed:', err);
       return null;
