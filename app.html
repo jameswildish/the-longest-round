@@ -637,7 +637,7 @@ function boot(sanityData){
   function renderGuest(r){
     document.getElementById('guestStageTag').textContent = r.stage;
     document.getElementById('guestMiles').textContent = r.miles;
-    document.getElementById('guestSummary').textContent = 'Rode with Darren on ' + r.stage + ' — Day ' + r.joinDay + ' of the expedition.';
+    document.getElementById('guestSummary').textContent = 'Rode with Darren on ' + r.stage + ' - Day ' + r.joinDay + ' of the expedition.';
     document.getElementById('guestDistance').textContent = r.miles + ' mi';
     document.getElementById('guestDuration').textContent = r.duration;
     document.getElementById('guestPace').textContent = r.pace;
@@ -648,9 +648,9 @@ function boot(sanityData){
     leadAv.innerHTML = LEAD.profilePic ? '<img src="'+LEAD.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+LEAD.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : LEAD.initials;
     document.getElementById('leadNameGuest').textContent = LEAD.name;
     document.getElementById('guestNoteText').textContent = '"' + r.note + '"';
-    document.getElementById('guestNoteName').textContent = '— ' + r.name;
+    document.getElementById('guestNoteName').textContent = '- ' + r.name;
     document.getElementById('guestStreakMiles').textContent = r.miles;
-    document.getElementById('guestQuoteBlock').innerHTML = '"You don\'t have to ride all 1,800 miles to make the miles you do ride count."<cite>— '+r.name+'</cite>';
+    document.getElementById('guestQuoteBlock').innerHTML = '"You don\'t have to ride all 1,800 miles to make the miles you do ride count."<cite>- '+r.name+'</cite>';
     document.getElementById('guestLogTitle').textContent = r.miles + ' mi Ridden';
     document.getElementById('guestLogMeta').textContent = r.stage + ' · ' + r.duration + ' · ' + r.pace + ' avg';
     document.getElementById('guestInsightText').textContent = 'Your stage, ' + r.stage + ', made up ' + r.contribPct + '% of the full 1,800-mile route to Morocco.';
@@ -711,7 +711,7 @@ function boot(sanityData){
     var last7 = DAILY_ENTRIES.slice(-7);
     var avg7 = Math.round(last7.reduce(function(a,e){return a+e.cyclingMiles;},0)/last7.length);
     document.getElementById('leadInsight').textContent =
-      TODAY_ENTRY.dayDescription || (totalCycled + ' miles cycled so far — averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + swimStops.length + ' swims complete.');
+      TODAY_ENTRY.dayDescription || (totalCycled + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + swimStops.length + ' swims complete.');
 
     var grid = document.getElementById('todayMetricGrid');
     grid.innerHTML =
@@ -728,7 +728,7 @@ function boot(sanityData){
         '<span class="rider-avatar">'+gAvatar+'</span>'+
         '<div class="guest-copy"><span class="section-label">Riding Today</span><div class="name">'+g.name+'</div><div class="role">'+(TODAY_ENTRY.ridingTodayNote||g.role)+'</div></div>';
     } else {
-      guestCard.innerHTML = '<div class="guest-copy"><span class="section-label">Riding Today</span><p class="empty-note">Solo leg today — no guest rider scheduled.</p></div>';
+      guestCard.innerHTML = '<div class="guest-copy"><span class="section-label">Riding Today</span><p class="empty-note">Solo leg today - no guest rider scheduled.</p></div>';
     }
 
     var list = document.getElementById('ritualList');
@@ -744,7 +744,7 @@ function boot(sanityData){
     updateRitualCount();
 
     document.getElementById('darrenJournalText').textContent = '"' + (TODAY_ENTRY.journal || 'No entry logged yet today.') + '"';
-    document.getElementById('darrenJournalDate').textContent = '— Day ' + TODAY_ENTRY.day + ', ' + MONTHS[TODAY_ENTRY.date.getMonth()] + ' ' + TODAY_ENTRY.date.getDate();
+    document.getElementById('darrenJournalDate').textContent = '- Day ' + TODAY_ENTRY.day + ', ' + MONTHS[TODAY_ENTRY.date.getMonth()] + ' ' + TODAY_ENTRY.date.getDate();
     var photoEl = document.getElementById('darrenJournalPhoto');
     photoEl.classList.toggle('has-photo', !!TODAY_ENTRY.journalPhoto);
     if (TODAY_ENTRY.journalPhoto) photoEl.innerHTML = '<img src="'+TODAY_ENTRY.journalPhoto+'?w=800&auto=format" alt="Journal photo" style="width:100%;height:auto;display:block;">';
@@ -842,7 +842,7 @@ function boot(sanityData){
     });
   })();
 
-  /* ---- Log: Daily Log, newest first — reads DAILY_ENTRIES directly, no re-entry ---- */
+  /* ---- Log: Daily Log, newest first - reads DAILY_ENTRIES directly, no re-entry ---- */
   (function(){
     var logList = document.getElementById('logList');
     DAILY_ENTRIES.slice().reverse().forEach(function(e){
@@ -905,8 +905,8 @@ function boot(sanityData){
     var last7 = DAILY_ENTRIES.slice(-7);
     var recentAvg = Math.round(last7.reduce(function(a,e){return a+e.cyclingMiles;},0)/last7.length);
     var text = recentAvg >= neededPerDay
-      ? 'Averaging ' + recentAvg + ' mi/day this week — ahead of the ' + neededPerDay + ' mi/day needed to reach Morocco in ' + remainingDays + ' days.'
-      : 'Averaging ' + recentAvg + ' mi/day this week — ' + neededPerDay + ' mi/day is needed over the remaining ' + remainingDays + ' days to stay on schedule.';
+      ? 'Averaging ' + recentAvg + ' mi/day this week - ahead of the ' + neededPerDay + ' mi/day needed to reach Morocco in ' + remainingDays + ' days.'
+      : 'Averaging ' + recentAvg + ' mi/day this week - ' + neededPerDay + ' mi/day is needed over the remaining ' + remainingDays + ' days to stay on schedule.';
     document.getElementById('paceText').textContent = text;
 
     var totalExpeditionDays = DAILY_ENTRIES.length + remainingDays;
@@ -950,7 +950,7 @@ function boot(sanityData){
     });
   })();
 
-  /* ---- Insights: What's Driving It — an editor (or an AI job watching the same
+  /* ---- Insights: What's Driving It - an editor (or an AI job watching the same
          data) can write straight into insightOverride; if empty, compute a plain
          read from the ritual/mileage relationship instead ---- */
   (function(){
@@ -967,9 +967,9 @@ function boot(sanityData){
         var diff = Math.round(avg(high) - avg(low));
         text = diff > 0
           ? 'Daily mileage runs ' + diff + ' mi higher on days with 3 or more Sisu rituals complete.'
-          : 'Rituals and mileage are still finding their rhythm — a few more days of data will sharpen this read.';
+          : 'Rituals and mileage are still finding their rhythm - a few more days of data will sharpen this read.';
       } else {
-        text = 'Every logged day has hit 3 or more Sisu rituals — recovery is no longer the limiting factor.';
+        text = 'Every logged day has hit 3 or more Sisu rituals - recovery is no longer the limiting factor.';
       }
     }
     document.getElementById('patternText').textContent = text;
@@ -983,7 +983,7 @@ function boot(sanityData){
 
     document.getElementById('sheetMetricGrid').innerHTML =
       '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling</span></div><span class="metric-value">'+entry.cyclingMiles+' mi</span></div>'+
-      '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming</span></div><span class="metric-value">'+(entry.swimmingMiles>0 ? entry.swimmingMiles+' mi' : '—')+'</span></div>'+
+      '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming</span></div><span class="metric-value">'+(entry.swimmingMiles>0 ? entry.swimmingMiles+' mi' : '-')+'</span></div>'+
       '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recovery</span></div><span class="metric-value">'+entry.recoveryScore+'%</span></div>'+
       '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+Math.floor(entry.sleepMinutes/60)+'h '+(entry.sleepMinutes%60)+'m</span></div>';
 
@@ -995,7 +995,7 @@ function boot(sanityData){
       guestCard.innerHTML = '<span class="rider-avatar">'+sheetAvatar+'</span><div class="guest-copy"><span class="section-label">Riding That Day</span><div class="name">'+g.name+'</div><div class="role">'+(entry.ridingTodayNote||g.role)+'</div></div>';
     } else {
       guestCard.style.display = 'block';
-      guestCard.innerHTML = '<div class="guest-copy"><span class="section-label">Riding That Day</span><p class="empty-note">Solo leg — no guest rider that day.</p></div>';
+      guestCard.innerHTML = '<div class="guest-copy"><span class="section-label">Riding That Day</span><p class="empty-note">Solo leg - no guest rider that day.</p></div>';
     }
 
     var list = document.getElementById('sheetRitualList');
