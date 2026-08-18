@@ -850,12 +850,17 @@ function boot(sanityData){
     });
   })();
 
+  var TARGET_PER_DAY = 100;
+  var activeDayCount = DAILY_ENTRIES.filter(function(e){ return e.cyclingMiles > 0; }).length;
+
   /* ---- Insights: all-time cumulative chart, with an on-pace target overlay ---- */
   (function(){
-    var cum = []; var run = 0; var activeDayCount = 0;
-    DAILY_ENTRIES.forEach(function(e){ run += e.cyclingMiles; cum.push(run); if(e.cyclingMiles>0) activeDayCount++; });
-    var TARGET_PER_DAY = 100;
+    var cum = []; var run = 0;
+    DAILY_ENTRIES.forEach(function(e){ run += e.cyclingMiles; cum.push(run); });
     var target = DAILY_ENTRIES.map(function(e,i){ return TARGET_PER_DAY*(i+1); });
+
+    document.getElementById('chartCallout').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Cycled · All-Time</span>';
+    if (cum.length < 2) return;
 
     var chartW=320, chartH=120, pad=6;
     var allVals = cum.concat(target);
@@ -873,7 +878,6 @@ function boot(sanityData){
     document.getElementById('areaFill').setAttribute('d', fill);
     document.getElementById('areaEnd').setAttribute('cx', pts[pts.length-1][0]);
     document.getElementById('areaEnd').setAttribute('cy', pts[pts.length-1][1]);
-    document.getElementById('chartCallout').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Cycled · All-Time</span>';
   })();
 
   /* ---- Insights: pace to Morocco, 100 mi/day target ---- */

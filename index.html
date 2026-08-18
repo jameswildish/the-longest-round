@@ -803,6 +803,9 @@ function boot(sanityData){
     var TARGET_PER_DAY = 100;
     var target = DAILY_ENTRIES.map(function(e,i){ return TARGET_PER_DAY*(i+1); });
 
+    document.getElementById('chartTotal').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Cycled · All-Time</span>';
+
+    if (cum.length >= 2) {
     var chartW=640, chartH=220, pad=8;
     var allVals = cum.concat(target);
     var min=Math.min.apply(null,allVals), max=Math.max.apply(null,allVals);
@@ -818,7 +821,7 @@ function boot(sanityData){
     document.getElementById('areaFill').setAttribute('d', fill);
     document.getElementById('areaEnd').setAttribute('cx', pts[pts.length-1][0]);
     document.getElementById('areaEnd').setAttribute('cy', pts[pts.length-1][1]);
-    document.getElementById('chartTotal').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Cycled · All-Time</span>';
+    }
 
     var remainingMiles = TOTAL_TARGET_MILES - totalCycled;
     var activeDays7 = DAILY_ENTRIES.slice(-7).filter(function(e){return e.cyclingMiles>0;});
