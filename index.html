@@ -582,7 +582,7 @@ function boot(sanityData){
     var stopByOrder = function(o){ return ROUTE_STOPS.find(function(s){ return s.order===o; }); };
     var fromS = stopByOrder(g.fromStop), toS = stopByOrder(g.toStop);
     g.stage = (g.fromStopName || (fromS&&fromS.name) || '') + ' → ' + (g.toStopName || (toS&&toS.name) || '');
-    g.contribPct = Math.round((g.miles/TOTAL_TARGET_MILES)*1000)/10;
+    g.contribPct = g.miles ? Math.round((g.miles/TOTAL_TARGET_MILES)*1000)/10 : 0;
     if (typeof g.duration !== 'string' && g.durationMinutes){
       var gh=Math.floor(g.durationMinutes/60), gm=g.durationMinutes%60;
       g.duration = gh+'h '+(gm<10?'0':'')+gm+'m';
@@ -893,11 +893,15 @@ function boot(sanityData){
       var card = document.createElement('div');
       card.className = 'rider-card';
       var guestAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
+      var metaHtml = g.stageComplete
+        ? '<div class="rider-meta"><span>'+g.miles+' mi stage</span><span>'+g.contribPct+'% of route</span><span>Day '+g.joinDay+'</span></div>'
+        : '<div class="rider-meta"><span>Stage in progress</span><span>Day '+g.joinDay+'</span></div>';
+      var quoteHtml = g.note ? '<p class="rider-quote">"'+g.note+'"</p>' : '';
       card.innerHTML =
         '<div class="rider-card-head"><span class="avatar">'+guestAvatar+'</span><div><div class="name">'+g.name+'</div></div></div>'+
         '<span class="rider-stage">'+g.stage+'</span>'+
-        '<p class="rider-quote">"'+g.note+'"</p>'+
-        '<div class="rider-meta"><span>'+g.miles+' mi stage</span><span>'+g.contribPct+'% of route</span><span>Day '+g.joinDay+'</span></div>';
+        quoteHtml+
+        metaHtml;
       grid.appendChild(card);
     });
   })();
@@ -985,7 +989,7 @@ function boot(sanityData){
       routeStops: '*[_type=="routeStop"]|order(order asc){order,name,type,"arrivalTime":arrivalTime,lat,lng}',
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,"profilePic":profilePic.asset->url}',
-      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
+      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,stageComplete,miles,durationMinutes,avgPaceMph,note}',
       dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}',
       locationUpdate: '*[_type=="locationUpdate"]|order(_createdAt desc)[0]{lat,lng,note}'
     };

@@ -51,6 +51,13 @@ export default defineType({
       type: 'number',
       description: 'Expedition day number this rider joined on.',
     }),
+    defineField({
+      name: 'stageComplete',
+      title: 'Stage Complete',
+      type: 'boolean',
+      description: 'Tick once the guest has finished their stage. Stats will only show on the site when this is checked.',
+      initialValue: false,
+    }),
     defineField({name: 'miles', title: 'Stage Miles', type: 'number'}),
     defineField({name: 'durationMinutes', title: 'Duration (minutes)', type: 'number'}),
     defineField({name: 'avgPaceMph', title: 'Average Pace (mph)', type: 'number'}),

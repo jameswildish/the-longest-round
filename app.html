@@ -289,13 +289,13 @@
 
             <div class="contrib-hero">
               <span class="contrib-num" id="guestMiles">0</span>
-              <span class="contrib-label">Miles On This Stage</span>
+              <span class="contrib-label" id="guestMilesLabel">Miles On This Stage</span>
               <p class="contrib-sub" id="guestSummary"></p>
             </div>
 
             <div class="route-strip" id="routeStripGuest"></div>
 
-            <div class="metric-grid">
+            <div class="metric-grid" id="guestMetricGrid">
               <div class="metric-tile"><div class="metric-top"><span class="metric-label">Distance</span></div><span class="metric-value" id="guestDistance"></span></div>
               <div class="metric-tile"><div class="metric-top"><span class="metric-label">Duration</span></div><span class="metric-value" id="guestDuration"></span></div>
               <div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Pace</span></div><span class="metric-value" id="guestPace"></span></div>
@@ -339,7 +339,7 @@
               <span class="contrib-label">Miles</span>
             </div>
 
-            <div class="card">
+            <div class="card" id="guestStageCard">
               <span class="section-label" style="margin-bottom:10px;display:block;">Your Stage</span>
               <div class="log-list">
                 <div class="log-row">
@@ -570,14 +570,14 @@ function boot(sanityData){
     var stopByOrder = function(o){ return ROUTE_STOPS.find(function(s){ return s.order===o; }); };
     var fromS = stopByOrder(g.fromStop), toS = stopByOrder(g.toStop);
     g.stage = (g.fromStopName || (fromS&&fromS.name) || '') + ' → ' + (g.toStopName || (toS&&toS.name) || '');
-    g.contribPct = Math.round((g.miles/TOTAL_TARGET_MILES)*1000)/10;
+    g.contribPct = g.miles ? Math.round((g.miles/TOTAL_TARGET_MILES)*1000)/10 : 0;
     if (typeof g.duration !== 'string' && g.durationMinutes){
       var gh=Math.floor(g.durationMinutes/60), gm=g.durationMinutes%60;
       g.duration = gh+'h '+(gm<10?'0':'')+gm+'m';
-    }
+    } else if (!g.durationMinutes) { g.duration = '—'; }
     if (typeof g.pace !== 'string' && g.avgPaceMph){
       g.pace = g.avgPaceMph.toFixed(1)+' mph';
-    }
+    } else if (!g.avgPaceMph) { g.pace = '—'; }
   });
 
   var TODAY_ENTRY = DAILY_ENTRIES[DAILY_ENTRIES.length-1];
@@ -617,14 +617,19 @@ function boot(sanityData){
   }
 
   function renderGuest(r){
+    var complete = !!r.stageComplete;
     document.getElementById('guestStageTag').textContent = r.stage;
-    document.getElementById('guestMiles').textContent = r.miles;
+    document.getElementById('guestMiles').textContent = complete ? r.miles : '—';
+    document.getElementById('guestMilesLabel').textContent = complete ? 'Miles On This Stage' : 'Stage In Progress';
     document.getElementById('guestSummary').textContent = 'Joined Darren on ' + r.stage + ' - Day ' + r.joinDay + ' of The Longest Round.';
-    document.getElementById('guestDistance').textContent = r.miles + ' mi';
-    document.getElementById('guestDuration').textContent = r.duration;
-    document.getElementById('guestPace').textContent = r.pace;
-    document.getElementById('guestContribPct').textContent = r.contribPct + '%';
-    document.getElementById('guestContribPct2').textContent = r.contribPct + '%';
+    document.getElementById('guestMetricGrid').style.display = complete ? '' : 'none';
+    if (complete) {
+      document.getElementById('guestDistance').textContent = r.miles + ' mi';
+      document.getElementById('guestDuration').textContent = r.duration;
+      document.getElementById('guestPace').textContent = r.pace;
+      document.getElementById('guestContribPct').textContent = r.contribPct + '%';
+    }
+    document.getElementById('guestContribPct2').textContent = complete ? r.contribPct + '%' : '—';
     var noteCard = document.getElementById('guestNoteText').closest('.journal-card');
     if (r.note) {
       noteCard.style.display = '';
@@ -633,13 +638,19 @@ function boot(sanityData){
     } else {
       noteCard.style.display = 'none';
     }
-    document.getElementById('guestStreakMiles').textContent = r.miles;
-    document.getElementById('guestLogTitle').textContent = r.miles + ' mi';
-    document.getElementById('guestLogMeta').textContent = r.stage + ' · ' + r.duration + ' · ' + r.pace + ' avg';
-    document.getElementById('guestInsightText').textContent = 'Your stage, ' + r.stage + ', made up ' + r.contribPct + '% of the full route to Morocco.';
+    document.getElementById('guestStreakMiles').textContent = complete ? r.miles : '—';
+    document.getElementById('guestStageCard').style.display = complete ? '' : 'none';
+    if (complete) {
+      document.getElementById('guestLogTitle').textContent = r.miles + ' mi';
+      document.getElementById('guestLogMeta').textContent = r.stage + ' · ' + r.duration + ' · ' + r.pace + ' avg';
+    }
+    document.getElementById('guestInsightText').textContent = complete
+      ? 'Your stage, ' + r.stage + ', made up ' + r.contribPct + '% of the full route to Morocco.'
+      : 'Your stage is still in progress. Stats will appear once it\'s complete.';
 
     var bestsGrid = document.getElementById('guestBestsGrid');
     bestsGrid.innerHTML = '';
+    if (!complete) return;
     [{label:'Distance', value:r.miles+' mi'},{label:'Avg Pace', value:r.pace},{label:'Duration', value:r.duration}].forEach(function(b){
       var tile = document.createElement('div');
       tile.className = 'best-tile';
@@ -1020,7 +1031,7 @@ function boot(sanityData){
       routeStops: '*[_type=="routeStop"]|order(order asc){order,name,type,"arrivalTime":arrivalTime,lat,lng}',
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,"profilePic":profilePic.asset->url}',
-      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
+      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,stageComplete,miles,durationMinutes,avgPaceMph,note}',
       dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}'
     };
     return Promise.all([
