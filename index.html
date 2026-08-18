@@ -47,8 +47,12 @@
   .social-links svg{width:18px;height:18px;}
 
   /* ---- Instagram Feed ---- */
-  .ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:28px;}
-  .ig-grid .instagram-media{margin:0 !important;min-width:0 !important;max-width:100% !important;width:100% !important;}
+  .ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:28px;}
+  .ig-card{position:relative;display:block;border-radius:14px;overflow:hidden;aspect-ratio:1;background:var(--surface);}
+  .ig-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease;}
+  .ig-card:hover img{transform:scale(1.04);}
+  .ig-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.15);opacity:0;transition:opacity .3s ease;}
+  .ig-card:hover .ig-overlay{opacity:1;}
 
   /* ---- Hero ---- */
   .hero{position:relative;padding:clamp(60px,12vh,120px) 0 clamp(56px,10vh,100px);overflow:hidden;text-align:center;}
@@ -759,28 +763,34 @@ function boot(sanityData){
     });
   })();
 
-  /* ---- Instagram Feed ---- */
+  /* ---- Instagram Feed (dynamic via Graph API) ---- */
   (function(){
-    var posts = sanityData.instagramPosts || [];
+    var token = sanityData.instagramToken;
     var grid = document.getElementById('igGrid');
-    if (!posts.length) {
-      grid.innerHTML = '<p style="color:var(--ink-faint);font-size:13px;">No posts yet — add Instagram post URLs in <a href="/studio" style="color:var(--ember);">Sanity Studio</a>.</p>';
+    if (!token) {
+      grid.innerHTML = '<p style="color:var(--ink-faint);font-size:13px;">Instagram feed will appear here once the access token is added in <a href="/studio" style="color:var(--ember);">Site Config</a>.</p>';
       return;
     }
-    posts.forEach(function(p){
-      var blockquote = document.createElement('blockquote');
-      blockquote.className = 'instagram-media';
-      blockquote.dataset.instgrmPermalink = p.url;
-      blockquote.dataset.instgrmVersion = '14';
-      blockquote.style.cssText = 'background:#1e1e1e;border:1px solid var(--hairline);border-radius:14px;padding:16px;margin:0;max-width:100%;min-width:0;';
-      blockquote.innerHTML = '<a href="'+p.url+'" target="_blank" rel="noopener" style="color:var(--ink-dim);font-size:13px;">View on Instagram</a>';
-      grid.appendChild(blockquote);
-    });
-    var script = document.createElement('script');
-    script.async = true;
-    script.src = '//www.instagram.com/embed.js';
-    script.onload = function(){ if (window.instgrm) window.instgrm.Embeds.process(); };
-    document.body.appendChild(script);
+    fetch('https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=6&access_token='+encodeURIComponent(token))
+      .then(function(res){ return res.json(); })
+      .then(function(json){
+        if (json.error) { grid.innerHTML = '<p style="color:var(--ink-faint);font-size:13px;">Instagram token expired — update it in <a href="/studio" style="color:var(--ember);">Site Config</a>.</p>'; return; }
+        var posts = json.data || [];
+        if (!posts.length) { grid.innerHTML = '<p style="color:var(--ink-faint);font-size:13px;">No posts found.</p>'; return; }
+        posts.forEach(function(p){
+          var imgSrc = p.media_type === 'VIDEO' ? p.thumbnail_url : p.media_url;
+          if (!imgSrc) return;
+          var card = document.createElement('a');
+          card.href = p.permalink;
+          card.target = '_blank';
+          card.rel = 'noopener';
+          card.className = 'ig-card';
+          var caption = p.caption ? p.caption.substring(0, 120) + (p.caption.length > 120 ? '…' : '') : '';
+          card.innerHTML = '<img src="'+imgSrc+'" alt="'+(caption.replace(/"/g,'&quot;'))+'" loading="lazy"><div class="ig-overlay">'+(p.media_type==='VIDEO'?'<svg viewBox="0 0 24 24" fill="white" style="width:32px;height:32px;"><polygon points="6,4 20,12 6,20"/></svg>':'')+'</div>';
+          grid.appendChild(card);
+        });
+      })
+      .catch(function(){ grid.innerHTML = '<p style="color:var(--ink-faint);font-size:13px;">Could not load Instagram feed.</p>'; });
   })();
 
   /* ---- Scroll reveal ---- */
@@ -816,7 +826,7 @@ function boot(sanityData){
       lead: '*[_type=="leadRider"][0]{name,initials,role,"profilePic":profilePic.asset->url}',
       guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,role,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
       dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,dayDescription,journal,"journalPhoto":journalPhoto.asset->url,insightOverride}',
-      instagramPosts: '*[_type=="instagramPost"]|order(order asc){url}'
+      siteConfig: '*[_type=="siteConfig"][0]{instagramToken}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),
@@ -824,11 +834,12 @@ function boot(sanityData){
       sanityQuery(queries.guests),
       sanityQuery(queries.dailyEntries),
       sanityQuery(queries.lead),
-      sanityQuery(queries.instagramPosts)
+      sanityQuery(queries.siteConfig)
     ]).then(function(results){
       var dailyEntries = results[3];
       var leadDoc = results[4];
-      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries||[], lead:(leadDoc&&leadDoc[0])||null, instagramPosts:results[5]||[]};
+      var config = results[5];
+      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries||[], lead:(leadDoc&&leadDoc[0])||null, instagramToken:(config&&config.instagramToken)||''};
     }).catch(function(err){
       console.warn('[The Longest Round] Sanity fetch failed:', err);
       return null;
