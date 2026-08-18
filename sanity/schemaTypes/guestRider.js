@@ -34,12 +34,6 @@ export default defineType({
       description: 'Headshot shown in rider strips, cards, and the website.',
     }),
     defineField({
-      name: 'role',
-      title: 'Role / Blurb',
-      type: 'string',
-      description: 'e.g. "Promoter, joins the send-off from Edinburgh".',
-    }),
-    defineField({
       name: 'fromStop',
       title: 'Stage Start',
       type: 'reference',
@@ -68,6 +62,6 @@ export default defineType({
     }),
   ],
   preview: {
-    select: {title: 'name', subtitle: 'role', media: 'profilePic'},
+    select: {title: 'name', media: 'profilePic'},
   },
 })

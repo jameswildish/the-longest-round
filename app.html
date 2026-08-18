@@ -530,7 +530,7 @@ function boot(sanityData){
   var TOTAL_TARGET_MILES = 1800;
 
   var leadDoc = sanityData && sanityData.lead;
-  var LEAD = { id:'darren', isLead:true, initials: (leadDoc&&leadDoc.initials)||'DB', name: (leadDoc&&leadDoc.name)||'Darren Barker', role: (leadDoc&&leadDoc.role)||'Solo Challenge Lead', profilePic: leadDoc&&leadDoc.profilePic||'' };
+  var LEAD = { id:'darren', isLead:true, initials: (leadDoc&&leadDoc.initials)||'DB', name: (leadDoc&&leadDoc.name)||'Darren Barker', profilePic: leadDoc&&leadDoc.profilePic||'' };
 
   if (!sanityData || !sanityData.dailyEntries || !sanityData.dailyEntries.length) {
     document.querySelector('.screens').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:60vh;text-align:center;padding:40px;color:var(--ink);opacity:0.7;font-size:15px;line-height:1.6;">No data yet.<br>Add daily entries in <a href="/studio" style="color:var(--aurora);">Sanity Studio</a> to get started.</div>';
@@ -726,7 +726,7 @@ function boot(sanityData){
       guestCard.style.display = 'flex';
       guestCard.innerHTML =
         '<span class="rider-avatar">'+gAvatar+'</span>'+
-        '<div class="guest-copy"><span class="section-label">Joining Me Today</span><div class="name">'+g.name+'</div><div class="role">'+(g.role||'')+'</div></div>';
+        '<div class="guest-copy"><span class="section-label">Joining Me Today</span><div class="name">'+g.name+'</div></div>';
     } else {
       guestCard.style.display = 'none';
     }
@@ -975,7 +975,7 @@ function boot(sanityData){
       var g = GUESTS.find(function(x){ return x.id===entry.ridingTodayGuestId; });
       guestCard.style.display = 'flex';
       var sheetAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
-      guestCard.innerHTML = '<span class="rider-avatar">'+sheetAvatar+'</span><div class="guest-copy"><span class="section-label">Joined By</span><div class="name">'+g.name+'</div><div class="role">'+(g.role||'')+'</div></div>';
+      guestCard.innerHTML = '<span class="rider-avatar">'+sheetAvatar+'</span><div class="guest-copy"><span class="section-label">Joined By</span><div class="name">'+g.name+'</div></div>';
     } else {
       guestCard.style.display = 'none';
     }
@@ -1046,8 +1046,8 @@ function boot(sanityData){
     var queries = {
       routeStops: '*[_type=="routeStop"]|order(order asc){order,name,type,"arrivalTime":arrivalTime,lat,lng}',
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
-      lead: '*[_type=="leadRider"][0]{name,initials,role,"profilePic":profilePic.asset->url}',
-      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,role,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
+      lead: '*[_type=="leadRider"][0]{name,initials,"profilePic":profilePic.asset->url}',
+      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
       dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}'
     };
     return Promise.all([

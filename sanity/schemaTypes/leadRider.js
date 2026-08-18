@@ -24,14 +24,8 @@ export default defineType({
       options: {hotspot: true},
       description: 'Headshot shown in the app header, rider strip, and website.',
     }),
-    defineField({
-      name: 'role',
-      title: 'Role',
-      type: 'string',
-      description: 'e.g. "Solo Challenge Lead".',
-    }),
   ],
   preview: {
-    select: {title: 'name', subtitle: 'role', media: 'profilePic'},
+    select: {title: 'name', media: 'profilePic'},
   },
 })
