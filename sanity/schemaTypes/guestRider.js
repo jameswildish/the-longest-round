@@ -27,6 +27,13 @@ export default defineType({
       validation: (r) => r.required().max(3),
     }),
     defineField({
+      name: 'profilePic',
+      title: 'Profile Picture',
+      type: 'image',
+      options: {hotspot: true},
+      description: 'Headshot shown in rider strips, cards, and the website.',
+    }),
+    defineField({
       name: 'role',
       title: 'Role / Blurb',
       type: 'string',
@@ -61,6 +68,6 @@ export default defineType({
     }),
   ],
   preview: {
-    select: {title: 'name', subtitle: 'role'},
+    select: {title: 'name', subtitle: 'role', media: 'profilePic'},
   },
 })

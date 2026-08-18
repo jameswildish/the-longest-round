@@ -62,6 +62,12 @@ export default defineType({
       description: 'Optional. Overrides the guest\'s default role text for this specific day.',
     }),
     defineField({
+      name: 'dayDescription',
+      title: 'Day Description',
+      type: 'text',
+      description: 'Darren\'s summary of the day — shown as the main description on the app and website.',
+    }),
+    defineField({
       name: 'journal',
       title: "Darren's Journal",
       type: 'text',

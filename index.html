@@ -119,7 +119,7 @@
   .archive-photo svg{width:100%;height:100%;display:block;}
   .photo-badge{width:12px;height:12px;margin-left:6px;vertical-align:-2px;color:var(--ink-faint);display:inline-block;}
   .guest-today{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:22px;border-top:1px solid var(--hairline);}
-  .guest-today .avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-raised);border:1.5px solid var(--ember);color:var(--ember-strong);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:500;font-size:13px;flex:none;}
+  .guest-today .avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-raised);border:1.5px solid var(--ember);color:var(--ember-strong);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:500;font-size:13px;flex:none;overflow:hidden;}
   .guest-today .name{font-size:13.5px;font-weight:600;}
   .guest-today .role{font-size:12px;color:var(--ink-faint);}
 
@@ -162,7 +162,7 @@
   .rider-card{background:var(--surface);border:1px solid var(--hairline);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:12px;}
   .rider-card.lead{border-color:var(--ember-dim);background:linear-gradient(180deg, var(--surface), var(--surface-hi));}
   .rider-card-head{display:flex;align-items:center;gap:12px;}
-  .rider-card .avatar{width:44px;height:44px;border-radius:50%;background:var(--surface-raised);border:1.5px solid var(--hairline-strong);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:500;font-size:15px;flex:none;}
+  .rider-card .avatar{width:44px;height:44px;border-radius:50%;background:var(--surface-raised);border:1.5px solid var(--hairline-strong);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:500;font-size:15px;flex:none;overflow:hidden;}
   .rider-card.lead .avatar{border-color:var(--ember);color:var(--ember-strong);}
   .rider-card .name{font-size:15px;font-weight:600;}
   .rider-card .role{font-size:12px;color:var(--ink-faint);line-height:1.4;}
@@ -414,7 +414,8 @@ function boot(sanityData){
   var RITUALS = sanityData.rituals || [];
   var GUESTS = sanityData.guests || [];
   var DAILY_ENTRIES = sanityData.dailyEntries;
-  var LEAD = { id:'darren', initials:'DB', name:'Darren Barker', role:'Solo Challenge Lead' };
+  var leadDoc = sanityData.lead;
+  var LEAD = { id:'darren', initials:(leadDoc&&leadDoc.initials)||'DB', name:(leadDoc&&leadDoc.name)||'Darren Barker', role:(leadDoc&&leadDoc.role)||'Solo Challenge Lead', profilePic:(leadDoc&&leadDoc.profilePic)||'' };
 
   ROUTE_STOPS.forEach(function(s){
     if (s.arrivalOffsetDays===undefined && s.arrivalTime){
@@ -551,7 +552,7 @@ function boot(sanityData){
     var swimsDone = swimStops.filter(function(s){ return s.arrivalOffsetDays<=0; }).length;
     var last7 = DAILY_ENTRIES.slice(-7);
     var avg7 = Math.round(last7.reduce(function(a,e){return a+e.cyclingMiles;},0)/last7.length);
-    document.getElementById('latestSub').textContent = totalCycled.toLocaleString('en-GB') + ' miles cycled so far — averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + swimStops.length + ' swims complete.';
+    document.getElementById('latestSub').textContent = TODAY_ENTRY.dayDescription || (totalCycled.toLocaleString('en-GB') + ' miles cycled so far — averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + swimStops.length + ' swims complete.');
 
     document.getElementById('latestStats').innerHTML =
       '<div class="stat-tile"><span class="stat-label">Cycling Today</span><span class="stat-value">'+TODAY_ENTRY.cyclingMiles+' mi</span></div>'+
@@ -577,7 +578,8 @@ function boot(sanityData){
     var guestEl = document.getElementById('latestGuest');
     if (TODAY_ENTRY.ridingTodayGuestId){
       var g = GUESTS.find(function(x){ return x.id===TODAY_ENTRY.ridingTodayGuestId; });
-      guestEl.innerHTML = '<span class="avatar">'+g.initials+'</span><div><div class="name">'+g.name+' rode today</div><div class="role">'+(TODAY_ENTRY.ridingTodayNote||g.role)+'</div></div>';
+      var gtAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=76&h=76&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
+      guestEl.innerHTML = '<span class="avatar">'+gtAvatar+'</span><div><div class="name">'+g.name+' rode today</div><div class="role">'+(TODAY_ENTRY.ridingTodayNote||g.role)+'</div></div>';
     } else {
       guestEl.innerHTML = '<div class="role">Solo leg today — no guest rider scheduled.</div>';
     }
@@ -666,8 +668,9 @@ function boot(sanityData){
     var grid = document.getElementById('riderGrid');
     var leadCard = document.createElement('div');
     leadCard.className = 'rider-card lead';
+    var leadAvatar = LEAD.profilePic ? '<img src="'+LEAD.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+LEAD.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : LEAD.initials;
     leadCard.innerHTML =
-      '<div class="rider-card-head"><span class="avatar">'+LEAD.initials+'</span><div><div class="name">'+LEAD.name+'</div><div class="role">'+LEAD.role+'</div></div></div>'+
+      '<div class="rider-card-head"><span class="avatar">'+leadAvatar+'</span><div><div class="name">'+LEAD.name+'</div><div class="role">'+LEAD.role+'</div></div></div>'+
       '<span class="rider-stage">The full 1,800-mile route</span>'+
       '<p class="rider-quote">"'+TODAY_ENTRY.journal+'"</p>'+
       '<div class="rider-meta"><span>'+totalCycled.toLocaleString('en-GB')+' mi so far</span><span>Day '+TODAY_ENTRY.day+'</span></div>';
@@ -676,8 +679,9 @@ function boot(sanityData){
     GUESTS.forEach(function(g){
       var card = document.createElement('div');
       card.className = 'rider-card';
+      var guestAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
       card.innerHTML =
-        '<div class="rider-card-head"><span class="avatar">'+g.initials+'</span><div><div class="name">'+g.name+'</div><div class="role">'+g.role+'</div></div></div>'+
+        '<div class="rider-card-head"><span class="avatar">'+guestAvatar+'</span><div><div class="name">'+g.name+'</div><div class="role">'+g.role+'</div></div></div>'+
         '<span class="rider-stage">'+g.stage+'</span>'+
         '<p class="rider-quote">"'+g.note+'"</p>'+
         '<div class="rider-meta"><span>'+g.miles+' mi stage</span><span>'+g.contribPct+'% of route</span><span>Day '+g.joinDay+'</span></div>';
@@ -759,17 +763,20 @@ function boot(sanityData){
     var queries = {
       routeStops: '*[_type=="routeStop"]|order(order asc){order,name,type,"arrivalTime":arrivalTime,lat,lng}',
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
-      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,role,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,journal,"journalPhoto":journalPhoto.asset->url,insightOverride}'
+      lead: '*[_type=="leadRider"][0]{name,initials,role,"profilePic":profilePic.asset->url}',
+      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,role,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,dayDescription,journal,"journalPhoto":journalPhoto.asset->url,insightOverride}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),
       sanityQuery(queries.rituals),
       sanityQuery(queries.guests),
-      sanityQuery(queries.dailyEntries)
+      sanityQuery(queries.dailyEntries),
+      sanityQuery(queries.lead)
     ]).then(function(results){
       var dailyEntries = results[3];
-      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries||[]};
+      var leadDoc = results[4];
+      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries||[], lead:(leadDoc&&leadDoc[0])||null};
     }).catch(function(err){
       console.warn('[The Longest Round] Sanity fetch failed:', err);
       return null;
