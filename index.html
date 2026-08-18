@@ -42,10 +42,6 @@
   .site-nav{display:flex;gap:clamp(14px,2.4vw,26px);flex-wrap:wrap;}
   .site-nav a{font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-dim);text-decoration:none;font-weight:600;transition:color .2s ease;}
   .site-nav a:hover{color:var(--aurora-strong);}
-  .social-links{display:flex;align-items:center;gap:12px;}
-  .social-links a{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;color:var(--ink-dim);transition:color .2s ease;}
-  .social-links a:hover{color:var(--ember);}
-  .social-links svg{width:18px;height:18px;}
 
   /* ---- Instagram ---- */
   .ig-cta{display:flex;align-items:stretch;gap:16px;margin-top:32px;flex-wrap:wrap;justify-content:center;}
@@ -89,8 +85,9 @@
   .hero-count-num{font-family:var(--font-display);font-weight:700;font-size:clamp(64px,13vw,148px);line-height:1;font-variant-numeric:tabular-nums;color:var(--ink);text-shadow:0 0 50px rgba(201,138,77,0.25);}
   .hero-count-label{font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-faint);margin-top:4px;}
   .hero-location{font-size:14px;color:var(--ember-strong);font-weight:600;margin:4px 0 30px;}
-  .hero-cta{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--ink-dim);text-decoration:none;border:1px solid var(--hairline-strong);padding:12px 22px;border-radius:999px;transition:all .2s ease;}
-  .hero-cta:hover{border-color:var(--aurora);color:var(--aurora-strong);}
+  .scroll-hint{display:inline-flex;align-items:center;justify-content:center;color:var(--ink-faint);text-decoration:none;animation:bobDown 2s ease-in-out infinite;margin-top:16px;transition:color .2s;}
+  .scroll-hint:hover{color:var(--ember);}
+  @keyframes bobDown{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
 
   /* ---- Sections generic ---- */
   .section{padding:clamp(56px,9vh,96px) 0;border-top:1px solid var(--hairline);}
@@ -235,10 +232,8 @@
 
   /* ---- Mobile ---- */
   @media(max-width:600px){
-    .site-header{padding:14px 16px;}
-    .site-nav{gap:10px 14px;font-size:10px;}
-    .social-links{gap:12px;}
-    .social-links svg{width:20px;height:20px;}
+    .site-header{padding:12px 16px;flex-direction:column;align-items:flex-start;gap:10px;}
+    .site-nav{gap:6px 12px;font-size:10px;}
     .hero{padding:clamp(40px,8vh,80px) 0 clamp(36px,6vh,60px);}
     .hero-title{font-size:clamp(28px,8vw,48px) !important;}
     .hero-sub{font-size:13px;padding:0 8px;}
@@ -279,11 +274,8 @@
     <a href="#riders">The Riders</a>
     <a href="#archive">Journey Archive</a>
     <a href="#cause">Why This Ride</a>
+    <a href="#sponsors">Sponsors &amp; Partners</a>
   </nav>
-  <div class="social-links">
-    <a href="https://www.instagram.com/thelongestroundchallenge/" target="_blank" rel="noopener" title="@thelongestroundchallenge" aria-label="The Longest Round on Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a>
-    <a href="https://www.instagram.com/mrdfbarker/" target="_blank" rel="noopener" title="@mrdfbarker" aria-label="Darren Barker on Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a>
-  </div>
 </header>
 
 <section class="hero">
@@ -300,7 +292,7 @@
       <span class="hero-count-label">Miles To Morocco</span>
     </div>
     <p class="hero-location" id="heroLocation"></p>
-    <a href="#journey" class="hero-cta">See the route ↓</a>
+    <a href="#story" class="scroll-hint" aria-label="Scroll down"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
   </div>
 </section>
 
