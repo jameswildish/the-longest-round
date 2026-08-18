@@ -638,8 +638,14 @@ function boot(sanityData){
     var leadAv = document.getElementById('leadAvatarGuest');
     leadAv.innerHTML = LEAD.profilePic ? '<img src="'+LEAD.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+LEAD.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : LEAD.initials;
     document.getElementById('leadNameGuest').textContent = LEAD.name;
-    document.getElementById('guestNoteText').textContent = '"' + r.note + '"';
-    document.getElementById('guestNoteName').textContent = '- ' + r.name;
+    var noteCard = document.getElementById('guestNoteText').closest('.journal-card');
+    if (r.note) {
+      noteCard.style.display = '';
+      document.getElementById('guestNoteText').textContent = '"' + r.note + '"';
+      document.getElementById('guestNoteName').textContent = '- ' + r.name;
+    } else {
+      noteCard.style.display = 'none';
+    }
     document.getElementById('guestStreakMiles').textContent = r.miles;
     document.getElementById('guestLogTitle').textContent = r.miles + ' mi';
     document.getElementById('guestLogMeta').textContent = r.stage + ' · ' + r.duration + ' · ' + r.pace + ' avg';
