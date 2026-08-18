@@ -901,7 +901,7 @@ function boot(sanityData){
     ]).then(function(results){
       var dailyEntries = results[3];
       var leadDoc = results[4];
-      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries||[], lead:(leadDoc&&leadDoc[0])||null};
+      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries||[], lead:leadDoc||null};
     }).catch(function(err){
       console.warn('[The Longest Round] Sanity fetch failed:', err);
       return null;
