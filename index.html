@@ -416,6 +416,9 @@ function boot(sanityData){
   });
   DAILY_ENTRIES.forEach(function(e){
     if (typeof e.date === 'string') e.date = new Date(e.date);
+    if (!e.ritualsCompleted) e.ritualsCompleted = [];
+    if (!e.journal) e.journal = '';
+    if (!e.insightOverride) e.insightOverride = '';
   });
   GUESTS.forEach(function(g){
     var stopByOrder = function(o){ return ROUTE_STOPS.find(function(s){ return s.order===o; }); };
