@@ -138,7 +138,7 @@
 
   .journal-photo{border-radius:14px;overflow:hidden;aspect-ratio:16/10;margin:6px 0 2px;display:none;}
   .journal-photo.has-photo{display:block;}
-  .journal-photo svg{width:100%;height:100%;display:block;}
+  .journal-photo svg, .journal-photo img{width:100%;height:100%;object-fit:cover;display:block;}
   .journal-card blockquote{margin:6px 0 0;font-size:13px;line-height:1.6;color:var(--ink-dim);font-style:italic;}
   .journal-card cite{display:block;margin-top:8px;font-size:10.5px;letter-spacing:0.05em;color:var(--ink-faint);font-style:normal;}
 
@@ -618,156 +618,18 @@ function boot(sanityData){
     starField.appendChild(s);
   }
 
-  /* ==================================================================
-     ROOT CONTENT
-     Everything below stands in for four Sanity document types. In a
-     live build, each const is replaced by a client.fetch() returning
-     documents shaped exactly like this — every screen already reads
-     from these four arrays only, so nothing needs to change downstream.
-
-       guestRider  -> GUESTS
-       routeStop   -> ROUTE_STOPS
-       ritual      -> RITUALS
-       dailyEntry  -> DAILY_ENTRIES   (the single root: everyone else derives from this)
-  ================================================================== */
-
   var TOTAL_TARGET_MILES = 1800;
-
-  // routeStop: name, type ('stop'|'swim'), order, arrivalOffsetDays (days from today;
-  // in Sanity this is a real `arrivalTime` datetime — "current" = latest stop already reached).
-  // lat/lng are carried here too, even though the phone UI keeps its compact strip —
-  // the public site's map plots straight from these same coordinates.
-  var FALLBACK_ROUTE_STOPS = [
-    {order:0,  name:'Edinburgh',     type:'stop', arrivalOffsetDays:-13, lat:55.9533, lng:-3.1883},
-    {order:1,  name:'Dover',         type:'stop', arrivalOffsetDays:-9,  lat:51.1279, lng:1.3134},
-    {order:2,  name:'Channel',       type:'swim', arrivalOffsetDays:-8,  lat:50.98,   lng:1.55},
-    {order:3,  name:'Calais',        type:'stop', arrivalOffsetDays:-7,  lat:50.9513, lng:1.8587},
-    {order:4,  name:'Amiens',        type:'stop', arrivalOffsetDays:2,   lat:49.8942, lng:2.2957},
-    {order:5,  name:'Bordeaux',      type:'stop', arrivalOffsetDays:6,   lat:44.8378, lng:-0.5792},
-    {order:6,  name:'San Sebastián', type:'stop', arrivalOffsetDays:10,  lat:43.3183, lng:-1.9812},
-    {order:7,  name:'Madrid',        type:'stop', arrivalOffsetDays:14,  lat:40.4168, lng:-3.7038},
-    {order:8,  name:'Gibraltar',     type:'stop', arrivalOffsetDays:18,  lat:36.1408, lng:-5.3536},
-    {order:9,  name:'Strait',        type:'swim', arrivalOffsetDays:19,  lat:35.95,   lng:-5.55},
-    {order:10, name:'Morocco',       type:'stop', arrivalOffsetDays:20,  lat:35.7595, lng:-5.8340}
-  ];
-
-  // ritual: title, order — this list alone drives the checklist, heatmap and log dots
-  var FALLBACK_RITUALS = [
-    {id:'ride',     title:'Ride session logged',   order:0},
-    {id:'recovery', title:'Recovery & physio',      order:1},
-    {id:'fuel',     title:'Fuel & hydration plan',  order:2},
-    {id:'mental',   title:'Mental health check-in', order:3}
-  ];
-
-  // guestRider: one document per guest, referenced everywhere by id — change a name
-  // here and the rider strip, "Riding Today" card and guest views all update together
-  var FALLBACK_GUESTS = [
-    { id:'eddie', initials:'EH', name:'Eddie Hearn', role:'Promoter, joins the send-off from Edinburgh',
-      fromStop:0, toStop:1, joinDay:3, miles:42, duration:'2h 30m', pace:'16.8 mph',
-      note:"Getting Darren off the start line was the easy part — watching him grind out the next 1,800 miles is the real story." },
-    { id:'tony', initials:'TB', name:'Tony Bellew', role:'Joins for the push out of Calais',
-      fromStop:3, toStop:4, joinDay:14, miles:78, duration:'4h 20m', pace:'18.0 mph',
-      note:"Channel's done, legs are heavy, but you don't stop for heavy legs on a ride like this." },
-    { id:'joe', initials:'JC', name:'Joe Calzaghe', role:'Joins through the Bordeaux vineyards',
-      fromStop:4, toStop:5, joinDay:18, miles:165, duration:'9h 05m', pace:'18.1 mph',
-      note:"Every mile out here is for someone who needed a reason to keep going." },
-    { id:'carl', initials:'CF', name:'Carl Frampton', role:'Joins along the Basque coast',
-      fromStop:5, toStop:6, joinDay:22, miles:145, duration:'8h 12m', pace:'17.7 mph',
-      note:"Belfast to the Basque coast — different roads, same fight." },
-    { id:'john', initials:'JT', name:'John Terry', role:'Joins for the long Spanish traverse',
-      fromStop:6, toStop:7, joinDay:26, miles:250, duration:'13h 50m', pace:'18.1 mph',
-      note:"Football taught me about pushing through pain. This is a different kind of pain, and a better reason." },
-    { id:'luke', initials:'LL', name:'Luke Littler', role:'Joins for the final approach to Gibraltar',
-      fromStop:7, toStop:8, joinDay:30, miles:210, duration:'11h 45m', pace:'17.9 mph',
-      note:"Never done anything like this before. Turns out darts doesn't prepare you for Spanish hills." }
-  ];
 
   var LEAD = { id:'darren', isLead:true, initials:'DB', name:'Darren Barker', role:'Solo Challenge Lead' };
 
-  // dailyEntry: THE ROOT. cyclingMiles / swimmingMiles / recoveryScore / sleepMinutes /
-  // ritualsCompleted / ridingTodayGuestId / journal / insightOverride are all editable
-  // per day in the CMS. Streak, heatmap, summary, chart, bests and pattern text below
-  // are all just different views over this one array — nothing is entered twice.
-  // This sample set only renders when Sanity isn't reachable or hasn't been populated yet.
-  var CYCLING_MILES = [46,52,58,44,40,0,36,58,62,66,70,74,78,58];
-  var SWIM_DAY_INDEX = 5; // day 6 (0-indexed 5) — the Channel crossing
-  var RITUALS_BY_DAY = [
-    ['ride','recovery','fuel'],
-    ['ride','recovery','fuel','mental'],
-    ['ride','recovery','fuel','mental'],
-    ['ride','fuel','mental'],
-    ['ride','recovery','fuel','mental'],
-    ['recovery','fuel','mental'],
-    ['ride','recovery','mental'],
-    ['ride','recovery','fuel','mental'],
-    ['ride','recovery','fuel','mental'],
-    ['ride','recovery','fuel'],
-    ['ride','recovery','fuel','mental'],
-    ['ride','recovery','fuel','mental'],
-    ['ride','recovery','fuel','mental'],
-    ['ride','recovery']
-  ];
-
-  function hash(i, salt){ var x = Math.sin(i*12.9898 + salt*78.233) * 43758.5453; return x - Math.floor(x); }
-
-  var FALLBACK_DAILY_ENTRIES = CYCLING_MILES.map(function(mi, i){
-    var offset = -(CYCLING_MILES.length-1-i);
-    var d = addDays(offset);
-    var recovery = Math.max(50, Math.min(99, Math.round(70 + (mi-52)*0.5 + (hash(i,2)-0.5)*10)));
-    var sleepMin = Math.round(370 + (mi-52)*0.8 + (hash(i,1)-0.5)*40);
-    var entry = {
-      day: i+1,
-      date: d,
-      cyclingMiles: mi,
-      swimmingMiles: i===SWIM_DAY_INDEX ? 21 : 0,
-      recoveryScore: recovery,
-      sleepMinutes: Math.max(240, sleepMin),
-      ritualsCompleted: RITUALS_BY_DAY[i],
-      ridingTodayGuestId: null,
-      ridingTodayNote: null,
-      journal: '',
-      journalPhoto: false, // in Sanity this is an `image` field on dailyEntry; a plain flag stands in for it here
-      insightOverride: ''
-    };
-    return entry;
-  });
-  // Per-day overrides an editor has actually filled in — everything else stays blank/computed
-  FALLBACK_DAILY_ENTRIES[4].ridingTodayGuestId = 'eddie'; // Dover arrival, day 5
-  FALLBACK_DAILY_ENTRIES[12].journal = "Long day into Calais tomorrow. Body's holding up better than the forecast.";
-  FALLBACK_DAILY_ENTRIES[12].journalPhoto = true;
-  var fallbackToday = FALLBACK_DAILY_ENTRIES[FALLBACK_DAILY_ENTRIES.length-1];
-  fallbackToday.ridingTodayGuestId = 'tony';
-  fallbackToday.ridingTodayNote = "Joins for today's push toward Amiens.";
-  fallbackToday.journal = "Legs are heavier than yesterday but the head's clear. Calais behind us, Amiens ahead. Tony's riding with me today — good to have company on the road for once.";
-  fallbackToday.journalPhoto = true;
-  fallbackToday.insightOverride = "Recovery held steady through the Channel swim — the extra rest day before Calais paid off.";
-
-  // Sample-image placeholder — no real photo asset exists yet, so this renders a
-  // small illustrated scene rather than pretending to be an actual ride photo.
-  // A live build swaps this for the real uploaded `journalPhoto` image.
-  function journalPhotoSVG(seed){
-    var gid = 'jp-grad-' + seed;
-    return '<svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Sample journal photo placeholder">'+
-      '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1">'+
-        '<stop offset="0%" stop-color="#3a2f22"/>'+
-        '<stop offset="45%" stop-color="#c98a4d" stop-opacity="0.55"/>'+
-        '<stop offset="100%" stop-color="#14130f"/>'+
-      '</linearGradient></defs>'+
-      '<rect width="400" height="250" fill="url(#'+gid+')"/>'+
-      '<circle cx="300" cy="110" r="32" fill="#e0a468" opacity="0.55"/>'+
-      '<polygon points="0,250 0,182 60,145 130,192 190,155 260,198 330,164 400,192 400,250" fill="#100f0c" opacity="0.9"/>'+
-      '<polygon points="0,250 0,212 90,183 180,216 260,192 340,220 400,206 400,250" fill="#0a0906"/>'+
-    '</svg>';
+  if (!sanityData || !sanityData.dailyEntries || !sanityData.dailyEntries.length) {
+    document.getElementById('phone').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;color:var(--ink);opacity:0.7;font-size:15px;line-height:1.6;">No data yet.<br>Add daily entries in <a href="/studio" style="color:var(--aurora);">Sanity Studio</a> to get started.</div>';
+    return;
   }
-
-  // ---- Pick real Sanity content when it's there; otherwise use the sample set
-  // above. Either way, normalize both shapes so every render function below —
-  // completely unchanged from before — just sees ROUTE_STOPS/RITUALS/GUESTS/
-  // DAILY_ENTRIES in the exact form it already expects. ----
-  var ROUTE_STOPS = (sanityData && sanityData.routeStops && sanityData.routeStops.length) ? sanityData.routeStops : FALLBACK_ROUTE_STOPS;
-  var RITUALS = (sanityData && sanityData.rituals && sanityData.rituals.length) ? sanityData.rituals : FALLBACK_RITUALS;
-  var GUESTS = (sanityData && sanityData.guests && sanityData.guests.length) ? sanityData.guests : FALLBACK_GUESTS;
-  var DAILY_ENTRIES = (sanityData && sanityData.dailyEntries && sanityData.dailyEntries.length) ? sanityData.dailyEntries : FALLBACK_DAILY_ENTRIES;
+  var ROUTE_STOPS = sanityData.routeStops || [];
+  var RITUALS = sanityData.rituals || [];
+  var GUESTS = sanityData.guests || [];
+  var DAILY_ENTRIES = sanityData.dailyEntries;
 
   ROUTE_STOPS.forEach(function(s){
     if (s.arrivalOffsetDays===undefined && s.arrivalTime){
@@ -935,7 +797,7 @@ function boot(sanityData){
     document.getElementById('darrenJournalDate').textContent = '— Day ' + TODAY_ENTRY.day + ', ' + MONTHS[TODAY_ENTRY.date.getMonth()] + ' ' + TODAY_ENTRY.date.getDate();
     var photoEl = document.getElementById('darrenJournalPhoto');
     photoEl.classList.toggle('has-photo', !!TODAY_ENTRY.journalPhoto);
-    if (TODAY_ENTRY.journalPhoto) photoEl.innerHTML = journalPhotoSVG('today');
+    if (TODAY_ENTRY.journalPhoto) photoEl.innerHTML = '<img src="'+TODAY_ENTRY.journalPhoto+'?w=800&auto=format" alt="Journal photo" style="width:100%;height:100%;object-fit:cover;">';
   })();
 
   function updateRitualCount(){
@@ -1194,7 +1056,7 @@ function boot(sanityData){
     document.getElementById('sheetJournalText').textContent = entry.journal ? ('"'+entry.journal+'"') : 'No journal entry logged for this day.';
     var sheetPhotoEl = document.getElementById('sheetJournalPhoto');
     sheetPhotoEl.classList.toggle('has-photo', !!entry.journalPhoto);
-    if (entry.journalPhoto) sheetPhotoEl.innerHTML = journalPhotoSVG('sheet-'+entry.day);
+    if (entry.journalPhoto) sheetPhotoEl.innerHTML = '<img src="'+entry.journalPhoto+'?w=800&auto=format" alt="Journal photo" style="width:100%;height:100%;object-fit:cover;">';
 
     document.getElementById('sheetBackdrop').classList.add('open');
     document.getElementById('daySheet').classList.add('open');
@@ -1235,13 +1097,7 @@ function boot(sanityData){
   document.querySelectorAll('.view[data-view="lead"]').forEach(function(v){ v.classList.add('active'); });
 }
 
-/* ==================================================================
-   Sanity connection. Fill in SANITY_PROJECT_ID (from sanity.io/manage
-   or the CLI output after `sanity init`) and this starts querying real
-   content instead of the sample set inside boot(). Until then — or if
-   the fetch fails, or the dataset is still empty — boot(null) runs and
-   the page falls back to the sample data automatically.
-================================================================== */
+/* Sanity CMS connection */
 (function(){
   var SANITY_PROJECT_ID = 'b5y3kr24';
   var SANITY_DATASET = 'production';
@@ -1261,7 +1117,7 @@ function boot(sanityData){
       routeStops: '*[_type=="routeStop"]|order(order asc){order,name,type,"arrivalTime":arrivalTime,lat,lng}',
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,role,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,journal,"journalPhoto":defined(journalPhoto),insightOverride}'
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,ridingTodayNote,journal,"journalPhoto":journalPhoto.asset->url,insightOverride}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),
@@ -1270,14 +1126,14 @@ function boot(sanityData){
       sanityQuery(queries.dailyEntries)
     ]).then(function(results){
       var dailyEntries = results[3];
-      if (!dailyEntries || !dailyEntries.length) return null; // dataset exists but empty — use sample data
-      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries};
+      // Pass through even when empty — the boot function handles the empty state
+      return {routeStops:results[0]||[], rituals:results[1]||[], guests:results[2]||[], dailyEntries:dailyEntries||[]};
     }).catch(function(err){
-      console.warn('[The Longest Round] Sanity fetch failed, showing sample data:', err);
+      console.warn('[The Longest Round] Sanity fetch failed:', err);
       return null;
     });
   }
 
-  fetchSanityContent().then(function(data){ boot(data); });
+  fetchSanityContent().then(function(data){ boot(data); }).catch(function(){ boot(null); });
 })();
 </script>
