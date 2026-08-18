@@ -1,18 +1,14 @@
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
+import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 
 export default defineConfig({
   name: 'the-longest-round',
   title: 'The Longest Round',
-
-  // Fill in after `sanity init` (or from sanity.io/manage) — send this
-  // value back and the app/site fetch layer can go live immediately.
   projectId: 'b5y3kr24',
   dataset: 'production',
-
-  plugins: [structureTool()],
-
+  plugins: [structureTool(), visionTool()],
   schema: {
     types: schemaTypes,
   },
