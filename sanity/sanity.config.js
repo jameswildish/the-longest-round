@@ -8,7 +8,7 @@ export default defineConfig({
 
   // Fill in after `sanity init` (or from sanity.io/manage) — send this
   // value back and the app/site fetch layer can go live immediately.
-  projectId: 'YOUR_PROJECT_ID',
+  projectId: 'b5y3kr24',
   dataset: 'production',
 
   plugins: [structureTool()],
