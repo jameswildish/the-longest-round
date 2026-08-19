@@ -41,9 +41,9 @@ export default defineType({
     }),
     defineField({
       name: 'arrivalTime',
-      title: 'Arrival Time',
+      title: 'Date',
       type: 'datetime',
-      description: 'Actual or estimated arrival. The site treats the latest stop already reached as "current".',
+      description: 'The site treats the latest stop already reached as "current".',
     }),
     defineField({
       name: 'lat',

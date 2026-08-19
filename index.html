@@ -748,7 +748,7 @@ function boot(sanityData){
       var row = document.createElement('div');
       row.className = 'stop-row' + (isDone?' done':'') + (isCurrent?' current':'');
       var d = addDays(node.arrivalOffsetDays);
-      var when = (node.arrivalOffsetDays<=0 ? '' : 'Est. ') + MONTHS[d.getMonth()]+' '+d.getDate();
+      var when = MONTHS[d.getMonth()]+' '+d.getDate();
       row.innerHTML = '<span class="stop-dot"></span><span class="stop-name">'+node.name+(node.type==='swim'?' Swim':'')+'</span><span class="stop-when">'+when+'</span>';
       el.appendChild(row);
     });
