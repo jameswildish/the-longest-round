@@ -404,7 +404,7 @@ document.getElementById('siteNav').addEventListener('click',function(e){
     <div class="progress-grid">
       <div class="chart-panel">
         <div class="chart-panel-head">
-          <div class="chart-total" id="chartTotal">0<span>Miles Cycled · All-Time</span></div>
+          <div class="chart-total" id="chartTotal">0<span>Miles Travelled</span></div>
         </div>
         <svg class="area-chart" id="areaChart" viewBox="0 0 640 220" preserveAspectRatio="none">
           <defs>
@@ -816,7 +816,7 @@ function boot(sanityData){
     var target = [];
     for (var d = 1; d <= TOTAL_JOURNEY_DAYS; d++) target.push(TARGET_PER_DAY * d);
 
-    document.getElementById('chartTotal').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Travelled · All-Time</span>';
+    document.getElementById('chartTotal').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Travelled</span>';
 
     if (cum.length >= 1) {
     var chartW=640, chartH=220, pad=8;
@@ -882,14 +882,38 @@ function boot(sanityData){
     if (overridden){
       patternText = overridden.insightOverride;
     } else {
-      var high = DAILY_ENTRIES.filter(function(e){ return e.ritualsCompleted.length >= 3; });
-      var low = DAILY_ENTRIES.filter(function(e){ return e.ritualsCompleted.length < 3; });
-      var avg = function(list){ return list.reduce(function(a,e){return a+(e.cyclingMiles||0);},0) / (list.length||1); };
-      if (high.length && low.length){
-        var diff = Math.round(avg(high) - avg(low));
-        patternText = diff > 0 ? 'Daily mileage runs ' + diff + ' mi higher on days with 3 or more Sisu rituals complete.' : 'Rituals and mileage are still finding their rhythm.';
+      var complete = DAILY_ENTRIES.filter(function(e){ return e.dayComplete; });
+      if (complete.length < 2) {
+        patternText = 'Not enough data. Check back once more days are logged.';
       } else {
-        patternText = 'Every logged day has hit 3 or more Sisu rituals - recharge is no longer the limiting factor.';
+        var insights = [];
+        var avgMi = Math.round(complete.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/complete.length);
+        var latest = complete[complete.length-1];
+        var prev = complete[complete.length-2];
+        if (latest.cyclingMiles && prev.cyclingMiles) {
+          var trend = latest.cyclingMiles - prev.cyclingMiles;
+          if (Math.abs(trend) >= 10) insights.push('Mileage '+(trend>0?'up':'down')+' '+Math.abs(Math.round(trend))+' mi from the previous day.');
+        }
+        var sleepDays = complete.filter(function(e){return e.sleepMinutes!=null;});
+        if (sleepDays.length >= 2) {
+          var bestSleep = sleepDays.reduce(function(a,b){return b.sleepMinutes>a.sleepMinutes?b:a;});
+          var bestMi = bestSleep.cyclingMiles||0;
+          if (bestMi >= avgMi) insights.push('Best sleep ('+Math.floor(bestSleep.sleepMinutes/60)+'h '+(bestSleep.sleepMinutes%60)+'m) coincided with '+bestMi+' mi on Day '+bestSleep.day+'.');
+        }
+        var recDays = complete.filter(function(e){return e.recoveryScore!=null;});
+        if (recDays.length >= 2) {
+          var avgRec = Math.round(recDays.reduce(function(a,e){return a+e.recoveryScore;},0)/recDays.length);
+          var highRec = recDays.filter(function(e){return e.recoveryScore>=avgRec;});
+          var lowRec = recDays.filter(function(e){return e.recoveryScore<avgRec;});
+          if (highRec.length && lowRec.length) {
+            var hiMi = Math.round(highRec.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/highRec.length);
+            var loMi = Math.round(lowRec.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/lowRec.length);
+            if (hiMi>loMi) insights.push('Higher recharge days average '+hiMi+' mi vs '+loMi+' mi on lower recharge days.');
+          }
+        }
+        if (avgMi >= TARGET_PER_DAY) insights.push('Averaging '+avgMi+' mi/day across '+complete.length+' days - on pace for Morocco.');
+        else insights.push('Averaging '+avgMi+' mi/day across '+complete.length+' days - '+(TARGET_PER_DAY-avgMi)+' mi/day below target pace.');
+        patternText = insights[0] || 'Not enough data. Check back once more days are logged.';
       }
     }
     document.getElementById('patternText').textContent = patternText;

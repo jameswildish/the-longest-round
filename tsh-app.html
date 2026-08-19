@@ -375,7 +375,7 @@
               </svg>
               <div class="chart-legend">
                 <span><i class="dot-actual"></i>Actual</span>
-                <span><i class="dot-target"></i>100 mi/day target</span>
+                <span><i class="dot-target"></i>Target pace</span>
               </div>
             </div>
 
@@ -852,31 +852,36 @@ function boot(sanityData){
   var TARGET_PER_DAY = 100;
   var activeDayCount = DAILY_ENTRIES.filter(function(e){ return e.cyclingMiles > 0; }).length;
 
-  /* ---- Insights: all-time cumulative chart, with an on-pace target overlay ---- */
+  /* ---- Insights: all-time cumulative chart, full-journey target diagonal ---- */
   (function(){
     var cum = []; var run = 0;
     DAILY_ENTRIES.forEach(function(e){ run += (e.cyclingMiles||0); cum.push(run); });
-    var target = DAILY_ENTRIES.map(function(e,i){ return TARGET_PER_DAY*(i+1); });
+    var TOTAL_JOURNEY_DAYS = Math.round(TOTAL_TARGET_MILES / TARGET_PER_DAY);
+    var target = [];
+    for (var d = 1; d <= TOTAL_JOURNEY_DAYS; d++) target.push(TARGET_PER_DAY * d);
 
-    document.getElementById('chartCallout').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Cycled · All-Time</span>';
-    if (cum.length < 2) return;
+    document.getElementById('chartCallout').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Travelled</span>';
 
+    if (cum.length >= 1) {
     var chartW=320, chartH=120, pad=6;
-    var allVals = cum.concat(target);
-    var min=Math.min.apply(null,allVals), max=Math.max.apply(null,allVals);
-    var range=(max-min)||1;
-    var stepX=(chartW-pad*2)/(cum.length-1);
-    function toPts(arr){ return arr.map(function(v,i){ return [pad+i*stepX, pad+(1-((v-min)/range))*(chartH-pad*2-14)+8]; }); }
-    var pts = toPts(cum);
-    var targetPts = toPts(target);
-    var line = 'M'+pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' L');
-    var targetLine = 'M'+targetPts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' L');
-    var fill = line+' L'+pts[pts.length-1][0].toFixed(1)+','+chartH+' L'+pts[0][0].toFixed(1)+','+chartH+' Z';
+    var max = TOTAL_TARGET_MILES;
+    var stepX = (chartW-pad*2)/TOTAL_JOURNEY_DAYS;
+    function toY(v){ return pad+(1-(v/max))*(chartH-pad*2-14)+8; }
+    var origin = [pad.toFixed(1), toY(0).toFixed(1)];
+    var targetPts = [origin];
+    target.forEach(function(v,i){ targetPts.push([(pad+(i+1)*stepX).toFixed(1), toY(v).toFixed(1)]); });
+    var targetLine = 'M'+targetPts.map(function(p){return p[0]+','+p[1];}).join(' L');
+    var pts = [origin];
+    cum.forEach(function(v,i){ pts.push([(pad+(i+1)*stepX).toFixed(1), toY(v).toFixed(1)]); });
+    var line = 'M'+pts.map(function(p){return p[0]+','+p[1];}).join(' L');
+    var last = pts[pts.length-1];
+    var fill = line+' L'+last[0]+','+chartH+' L'+origin[0]+','+chartH+' Z';
     document.getElementById('areaLine').setAttribute('d', line);
     document.getElementById('areaTarget').setAttribute('d', targetLine);
     document.getElementById('areaFill').setAttribute('d', fill);
-    document.getElementById('areaEnd').setAttribute('cx', pts[pts.length-1][0]);
-    document.getElementById('areaEnd').setAttribute('cy', pts[pts.length-1][1]);
+    document.getElementById('areaEnd').setAttribute('cx', last[0]);
+    document.getElementById('areaEnd').setAttribute('cy', last[1]);
+    }
   })();
 
   /* ---- Insights: pace to Morocco, 100 mi/day target ---- */
@@ -942,17 +947,38 @@ function boot(sanityData){
     if (overridden){
       text = overridden.insightOverride;
     } else {
-      var ritStateInsight = getRitualState();
-      var high = DAILY_ENTRIES.filter(function(e){ return (ritStateInsight[e.day]||[]).length >= 3; });
-      var low = DAILY_ENTRIES.filter(function(e){ return (ritStateInsight[e.day]||[]).length < 3; });
-      var avg = function(list){ return list.reduce(function(a,e){return a+(e.cyclingMiles||0);},0) / (list.length||1); };
-      if (high.length && low.length){
-        var diff = Math.round(avg(high) - avg(low));
-        text = diff > 0
-          ? 'Daily mileage runs ' + diff + ' mi higher on days with 3 or more Sisu rituals complete.'
-          : 'Rituals and mileage are still finding their rhythm - a few more days of data will sharpen this read.';
+      var complete = DAILY_ENTRIES.filter(function(e){ return e.dayComplete; });
+      if (complete.length < 2) {
+        text = 'Not enough data. Check back once more days are logged.';
       } else {
-        text = 'Every logged day has hit 3 or more Sisu rituals - recharge is no longer the limiting factor.';
+        var insights = [];
+        var avgMi = Math.round(complete.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/complete.length);
+        var latest = complete[complete.length-1];
+        var prev = complete[complete.length-2];
+        if (latest.cyclingMiles && prev.cyclingMiles) {
+          var trend = latest.cyclingMiles - prev.cyclingMiles;
+          if (Math.abs(trend) >= 10) insights.push('Mileage '+(trend>0?'up':'down')+' '+Math.abs(Math.round(trend))+' mi from the previous day.');
+        }
+        var sleepDays = complete.filter(function(e){return e.sleepMinutes!=null;});
+        if (sleepDays.length >= 2) {
+          var bestSleep = sleepDays.reduce(function(a,b){return b.sleepMinutes>a.sleepMinutes?b:a;});
+          var bestMi = bestSleep.cyclingMiles||0;
+          if (bestMi >= avgMi) insights.push('Best sleep ('+Math.floor(bestSleep.sleepMinutes/60)+'h '+(bestSleep.sleepMinutes%60)+'m) coincided with '+bestMi+' mi on Day '+bestSleep.day+'.');
+        }
+        var recDays = complete.filter(function(e){return e.recoveryScore!=null;});
+        if (recDays.length >= 2) {
+          var avgRec = Math.round(recDays.reduce(function(a,e){return a+e.recoveryScore;},0)/recDays.length);
+          var highRec = recDays.filter(function(e){return e.recoveryScore>=avgRec;});
+          var lowRec = recDays.filter(function(e){return e.recoveryScore<avgRec;});
+          if (highRec.length && lowRec.length) {
+            var hiMi = Math.round(highRec.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/highRec.length);
+            var loMi = Math.round(lowRec.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/lowRec.length);
+            if (hiMi>loMi) insights.push('Higher recharge days average '+hiMi+' mi vs '+loMi+' mi on lower recharge days.');
+          }
+        }
+        if (avgMi >= TARGET_PER_DAY) insights.push('Averaging '+avgMi+' mi/day across '+complete.length+' days - on pace for Morocco.');
+        else insights.push('Averaging '+avgMi+' mi/day across '+complete.length+' days - '+(TARGET_PER_DAY-avgMi)+' mi/day below target pace.');
+        text = insights[0] || 'Not enough data. Check back once more days are logged.';
       }
     }
     document.getElementById('patternText').textContent = text;
