@@ -400,7 +400,7 @@ document.getElementById('siteNav').addEventListener('click',function(e){
   <div class="wrap">
     <span class="eyebrow">Progress</span>
     <h2>Pace To Morocco</h2>
-    <p class="section-sub">Cumulative miles travelled against a 100 mile per day target.</p>
+    <p class="section-sub">Cumulative miles travelled against the 1,800-mile target pace.</p>
     <div class="progress-grid">
       <div class="chart-panel">
         <div class="chart-panel-head">
@@ -420,7 +420,7 @@ document.getElementById('siteNav').addEventListener('click',function(e){
         </svg>
         <div class="chart-legend">
           <span><i class="dot-actual"></i>Actual</span>
-          <span><i class="dot-target"></i>100 mi/day target</span>
+          <span><i class="dot-target"></i>Target pace</span>
         </div>
       </div>
       <div class="side-stack">
@@ -807,26 +807,27 @@ function boot(sanityData){
     }
   })();
 
-  /* ---- Progress: chart with on-pace target ---- */
+  /* ---- Progress: chart with full-journey target diagonal ---- */
   (function(){
     var cum = []; var run = 0; var activeDayCount = 0;
     DAILY_ENTRIES.forEach(function(e){ run += (e.cyclingMiles||0); cum.push(run); if(e.cyclingMiles>0) activeDayCount++; });
     var TARGET_PER_DAY = 100;
-    var target = DAILY_ENTRIES.map(function(e,i){ return TARGET_PER_DAY*(i+1); });
+    var TOTAL_JOURNEY_DAYS = Math.round(TOTAL_TARGET_MILES / TARGET_PER_DAY);
+    var target = [];
+    for (var d = 1; d <= TOTAL_JOURNEY_DAYS; d++) target.push(TARGET_PER_DAY * d);
 
-    document.getElementById('chartTotal').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Cycled · All-Time</span>';
+    document.getElementById('chartTotal').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Travelled · All-Time</span>';
 
     if (cum.length >= 1) {
     var chartW=640, chartH=220, pad=8;
-    var allVals = cum.concat(target);
-    var min=0, max=Math.max.apply(null,allVals)||1;
-    var range=max||1;
-    var stepX=cum.length>1?(chartW-pad*2)/(cum.length-1):0;
-    function toPts(arr){ return arr.map(function(v,i){ return [pad+i*stepX, pad+(1-(v/range))*(chartH-pad*2-18)+10]; }); }
-    var pts = toPts(cum), targetPts = toPts(target);
-    var line = 'M'+pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' L');
-    var targetLine = 'M'+targetPts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' L');
-    var fill = line+' L'+pts[pts.length-1][0].toFixed(1)+','+chartH+' L'+pts[0][0].toFixed(1)+','+chartH+' Z';
+    var max = TOTAL_TARGET_MILES;
+    var stepX = (chartW-pad*2)/(TOTAL_JOURNEY_DAYS-1);
+    function toY(v){ return pad+(1-(v/max))*(chartH-pad*2-18)+10; }
+    var targetPts = target.map(function(v,i){ return [(pad+i*stepX).toFixed(1), toY(v).toFixed(1)]; });
+    var targetLine = 'M'+targetPts.map(function(p){return p[0]+','+p[1];}).join(' L');
+    var pts = cum.map(function(v,i){ return [(pad+i*stepX).toFixed(1), toY(v).toFixed(1)]; });
+    var line = 'M'+pts.map(function(p){return p[0]+','+p[1];}).join(' L');
+    var fill = line+' L'+pts[pts.length-1][0]+','+chartH+' L'+pts[0][0]+','+chartH+' Z';
     document.getElementById('areaLine').setAttribute('d', line);
     document.getElementById('areaTarget').setAttribute('d', targetLine);
     document.getElementById('areaFill').setAttribute('d', fill);
@@ -860,27 +861,17 @@ function boot(sanityData){
     var dp = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
     function best(key, label, fmt){
       var filtered = DAILY_ENTRIES.filter(function(e){ return e[key]!=null; });
-      if (!filtered.length) return {label:label, value:dp};
+      if (!filtered.length) return {label:label, value:dp, day:''};
       var winner = filtered.reduce(function(a,b){ return b[key] > a[key] ? b : a; });
-      return {label:label, value:fmt(winner)};
+      return {label:label, value:fmt(winner), day:'Day '+winner.day};
     }
-    var completeDays = DAILY_ENTRIES.filter(function(e){ return e.dayComplete; });
-    var avgMiles = completeDays.length ? Math.round(totalCycled / completeDays.length) : 0;
-    var hrEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHeartRate; });
-    var avgHR = hrEntries.length ? Math.round(hrEntries.reduce(function(a,e){return a+e.avgHeartRate;},0)/hrEntries.length) : 0;
-    var hrvEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHRV; });
-    var avgHRV = hrvEntries.length ? Math.round(hrvEntries.reduce(function(a,e){return a+e.avgHRV;},0)/hrvEntries.length) : 0;
     var bests = [
       best('cyclingMiles','Longest Ride', function(e){ return e.cyclingMiles+' mi'; }),
-      best('recoveryScore','Peak Recharge %', function(e){ return e.recoveryScore+'%'; }),
+      best('recoveryScore','Best Recharge %', function(e){ return e.recoveryScore+'%'; }),
       best('sleepMinutes','Best Sleep', function(e){ return Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m'; }),
-      {label:'Avg Daily Miles', value:completeDays.length ? avgMiles+' mi' : dp},
-      best('avgHeartRate','Peak Activity HR', function(e){ return e.avgHeartRate+' bpm'; }),
-      {label:'Avg Activity HR', value:hrEntries.length ? avgHR+' bpm' : dp},
-      best('avgHRV','Best Morning HRV', function(e){ return e.avgHRV+' ms'; }),
-      {label:'Avg Morning HRV', value:hrvEntries.length ? avgHRV+' ms' : dp}
+      best('avgHRV','Best Morning HRV', function(e){ return e.avgHRV+' ms'; })
     ];
-    document.getElementById('bestsRow').innerHTML = bests.map(function(b){ return '<div class="best-mini"><span class="v">'+b.value+'</span><span class="l">'+b.label+'</span></div>'; }).join('');
+    document.getElementById('bestsRow').innerHTML = bests.map(function(b){ return '<div class="best-mini"><span class="v">'+b.value+'</span><span class="l">'+b.label+'</span>'+(b.day?'<span class="l" style="margin-top:2px;">'+b.day+'</span>':'')+'</div>'; }).join('');
 
     var overridden = DAILY_ENTRIES.slice().reverse().find(function(e){ return e.insightOverride; });
     var patternText;

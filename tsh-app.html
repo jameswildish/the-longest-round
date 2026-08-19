@@ -181,7 +181,7 @@
   .progress-fill.days{background:var(--ember);}
   .progress-pct{font-size:11px;font-weight:600;color:var(--ink-dim);width:34px;text-align:right;flex:none;font-variant-numeric:tabular-nums;}
 
-  .bests-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .bests-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
   .best-tile{background:var(--surface);border:1px solid var(--hairline);border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;gap:3px;}
   .best-label{font-size:9px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-faint);}
   .best-value{font-family:var(--font-display);font-weight:700;font-size:17px;line-height:1.2;font-variant-numeric:tabular-nums;}
@@ -916,23 +916,13 @@ function boot(sanityData){
       var filtered = DAILY_ENTRIES.filter(function(e){ return e[key]!=null; });
       if (!filtered.length) return {label:label, value:pendingHtml, date:''};
       var winner = filtered.reduce(function(a,b){ return b[key] > a[key] ? b : a; });
-      return {label:label, value:fmt(winner), date: (winner===TODAY_ENTRY ? 'Today' : MONTHS[winner.date.getMonth()]+' '+winner.date.getDate())};
+      return {label:label, value:fmt(winner), date:'Day '+winner.day};
     }
-    var completeDays = DAILY_ENTRIES.filter(function(e){ return e.dayComplete; });
-    var hrEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHeartRate; });
-    var avgHR = hrEntries.length ? Math.round(hrEntries.reduce(function(a,e){return a+e.avgHeartRate;},0)/hrEntries.length) : 0;
-    var hrvEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHRV; });
-    var avgHRV = hrvEntries.length ? Math.round(hrvEntries.reduce(function(a,e){return a+e.avgHRV;},0)/hrvEntries.length) : 0;
-    var avgMiles = completeDays.length ? Math.round(totalCycled / completeDays.length) : 0;
     var bests = [
       best('cyclingMiles', 'Longest Ride', function(e){ return e.cyclingMiles+' mi'; }),
-      best('recoveryScore', 'Peak Recharge %', function(e){ return e.recoveryScore+'%'; }),
+      best('recoveryScore', 'Best Recharge %', function(e){ return e.recoveryScore+'%'; }),
       best('sleepMinutes', 'Best Sleep', function(e){ return Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m'; }),
-      {label:'Avg Daily Miles', value:completeDays.length ? avgMiles+' mi' : pendingHtml, date:''},
-      best('avgHeartRate', 'Peak Activity HR', function(e){ return e.avgHeartRate+' bpm'; }),
-      {label:'Avg Activity HR', value:hrEntries.length ? avgHR+' bpm' : pendingHtml, date:''},
-      best('avgHRV', 'Best Morning HRV', function(e){ return e.avgHRV+' ms'; }),
-      {label:'Avg Morning HRV', value:hrvEntries.length ? avgHRV+' ms' : pendingHtml, date:''}
+      best('avgHRV', 'Best Morning HRV', function(e){ return e.avgHRV+' ms'; })
     ];
     var grid = document.getElementById('bestsGrid');
     bests.forEach(function(b){
