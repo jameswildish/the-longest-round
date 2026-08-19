@@ -2,7 +2,7 @@
   "name": "The Longest Round",
   "short_name": "Longest Round",
   "description": "Track Darren Barker's 1,800-mile cycling and open-water swimming challenge from Edinburgh to Morocco",
-  "start_url": "/app.html",
+  "start_url": "/tsh-app",
   "display": "standalone",
   "background_color": "#151515",
   "theme_color": "#151515",

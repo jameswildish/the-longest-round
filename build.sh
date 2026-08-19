@@ -16,7 +16,7 @@ fi
 
 # Copy static files to output root
 cp index.html output/index.html
-cp app.html output/app.html
+cp tsh-app.html output/tsh-app.html
 cp manifest.json output/manifest.json
 cp icon-192.png output/icon-192.png
 cp icon-512.png output/icon-512.png
