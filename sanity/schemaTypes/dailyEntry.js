@@ -64,6 +64,7 @@ export default defineType({
       name: 'ridingTodayGuest',
       title: 'Riding Today',
       type: 'reference',
+      weak: true,
       to: [{type: 'guestRider'}],
       description: 'Leave empty on solo days — the app and site both show a "solo leg" state automatically.',
     }),
