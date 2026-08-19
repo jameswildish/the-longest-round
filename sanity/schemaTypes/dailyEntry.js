@@ -31,7 +31,7 @@ export default defineType({
     }),
     defineField({
       name: 'recoveryScore',
-      title: 'Recovery Score (%)',
+      title: 'Recharge Score (%)',
       type: 'number',
       validation: (r) => r.min(0).max(100),
     }),
@@ -42,16 +42,16 @@ export default defineType({
     }),
     defineField({
       name: 'avgHeartRate',
-      title: 'Avg Heart Rate (bpm)',
+      title: "Today's Activity AVG HR (bpm)",
       type: 'number',
       description: 'Average heart rate for the day from BiotrackOS or manual entry.',
       validation: (r) => r.min(30).max(220),
     }),
     defineField({
       name: 'avgHRV',
-      title: 'Avg HRV (ms)',
+      title: 'Morning HRV (ms)',
       type: 'number',
-      description: 'Average heart rate variability for the day.',
+      description: 'Morning heart rate variability reading.',
       validation: (r) => r.min(0).max(300),
     }),
     defineField({

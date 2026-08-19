@@ -714,10 +714,10 @@ function boot(sanityData){
     var tiles = '';
     tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling Today</span></div><span class="metric-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
     if (TODAY_ENTRY.swimmingMiles!=null) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming Today</span></div><span class="metric-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
-    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recovery</span></div><span class="metric-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recharge</span></div><span class="metric-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
     tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+(TODAY_ENTRY.sleepMinutes!=null?Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m':pending)+'</span></div>';
-    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HR</span></div><span class="metric-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';
-    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HRV</span></div><span class="metric-value">'+(TODAY_ENTRY.avgHRV!=null?TODAY_ENTRY.avgHRV+' ms':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Activity HR</span></div><span class="metric-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Morning HRV</span></div><span class="metric-value">'+(TODAY_ENTRY.avgHRV!=null?TODAY_ENTRY.avgHRV+' ms':pending)+'</span></div>';
     grid.innerHTML = tiles;
 
     var guestCard = document.getElementById('guestOfDayCard');
@@ -832,7 +832,7 @@ function boot(sanityData){
       row.className = 'log-row';
       var sleepLabel = e.sleepMinutes!=null ? Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m sleep' : '';
       var distLabel = e.cyclingMiles!=null ? (e.swimmingMiles>0 ? (e.cyclingMiles+' mi + '+e.swimmingMiles+' mi swim') : (e.cyclingMiles+' mi')) : 'Data pending';
-      var recoveryLabel = e.recoveryScore!=null ? e.recoveryScore+'% recovery' : '';
+      var recoveryLabel = e.recoveryScore!=null ? e.recoveryScore+'% recharge' : '';
       var metaParts = [sleepLabel, recoveryLabel, (getRitualState()[e.day]||[]).length+'/'+RITUALS.length+' rituals'].filter(function(s){return s;});
       if (e.avgHeartRate) metaParts.push(e.avgHeartRate+' bpm');
       if (e.avgHRV) metaParts.push(e.avgHRV+' ms HRV');
@@ -919,7 +919,7 @@ function boot(sanityData){
     }
     var bests = [
       best('cyclingMiles', 'Longest Ride', function(e){ return e.cyclingMiles+' mi'; }),
-      best('recoveryScore', 'Peak Recovery', function(e){ return e.recoveryScore+'%'; }),
+      best('recoveryScore', 'Peak Recharge', function(e){ return e.recoveryScore+'%'; }),
       best('sleepMinutes', 'Best Sleep', function(e){ return Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m'; })
     ];
     var grid = document.getElementById('bestsGrid');
@@ -950,7 +950,7 @@ function boot(sanityData){
           ? 'Daily mileage runs ' + diff + ' mi higher on days with 3 or more Sisu rituals complete.'
           : 'Rituals and mileage are still finding their rhythm - a few more days of data will sharpen this read.';
       } else {
-        text = 'Every logged day has hit 3 or more Sisu rituals - recovery is no longer the limiting factor.';
+        text = 'Every logged day has hit 3 or more Sisu rituals - recharge is no longer the limiting factor.';
       }
     }
     document.getElementById('patternText').textContent = text;
@@ -966,10 +966,10 @@ function boot(sanityData){
     var sp = '<span style="color:var(--ink-faint);font-size:13px;">Data pending</span>';
     sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling</span></div><span class="metric-value">'+(entry.cyclingMiles!=null?entry.cyclingMiles+' mi':sp)+'</span></div>';
     if (entry.swimmingMiles!=null) sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming</span></div><span class="metric-value">'+entry.swimmingMiles+' mi</span></div>';
-    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recovery</span></div><span class="metric-value">'+(entry.recoveryScore!=null?entry.recoveryScore+'%':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recharge</span></div><span class="metric-value">'+(entry.recoveryScore!=null?entry.recoveryScore+'%':sp)+'</span></div>';
     sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+(entry.sleepMinutes!=null?Math.floor(entry.sleepMinutes/60)+'h '+(entry.sleepMinutes%60)+'m':sp)+'</span></div>';
-    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HR</span></div><span class="metric-value">'+(entry.avgHeartRate!=null?entry.avgHeartRate+' bpm':sp)+'</span></div>';
-    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HRV</span></div><span class="metric-value">'+(entry.avgHRV!=null?entry.avgHRV+' ms':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Activity HR</span></div><span class="metric-value">'+(entry.avgHeartRate!=null?entry.avgHeartRate+' bpm':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Morning HRV</span></div><span class="metric-value">'+(entry.avgHRV!=null?entry.avgHRV+' ms':sp)+'</span></div>';
     document.getElementById('sheetMetricGrid').innerHTML = sheetTiles;
 
     var guestCard = document.getElementById('sheetGuestCard');

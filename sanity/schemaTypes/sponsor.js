@@ -28,7 +28,6 @@ export default defineType({
       name: 'order',
       title: 'Display Order',
       type: 'number',
-      initialValue: 0,
     }),
   ],
   orderings: [
