@@ -594,7 +594,7 @@ function boot(sanityData){
   });
 
   var TODAY_ENTRY = DAILY_ENTRIES[DAILY_ENTRIES.length-1];
-  var totalCycled = DAILY_ENTRIES.reduce(function(a,e){return a+(e.dayComplete?e.cyclingMiles:0);},0);
+  var totalCycled = DAILY_ENTRIES.reduce(function(a,e){return a+(e.dayComplete&&e.cyclingMiles?e.cyclingMiles:0);},0);
 
   function currentStopOrder(){
     var reached = ROUTE_STOPS.filter(function(s){ return s.arrivalOffsetDays <= 0; });
@@ -755,16 +755,17 @@ function boot(sanityData){
     var swimStops = ROUTE_STOPS.filter(function(s){ return s.type==='swim'; });
     var swimsDone = swimStops.filter(function(s){ return s.arrivalOffsetDays<=0; }).length;
     var last7 = DAILY_ENTRIES.slice(-7);
-    var avg7 = Math.round(last7.reduce(function(a,e){return a+e.cyclingMiles;},0)/last7.length);
+    var avg7 = Math.round(last7.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/last7.length);
     document.getElementById('latestSub').textContent = totalCycled.toLocaleString('en-GB') + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + swimStops.length + ' swims complete.';
 
+    var pending = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
     var statTiles = '';
-    if (TODAY_ENTRY.cyclingMiles) statTiles += '<div class="stat-tile"><span class="stat-label">Cycling Today</span><span class="stat-value">'+TODAY_ENTRY.cyclingMiles+' mi</span></div>';
-    if (TODAY_ENTRY.swimmingMiles) statTiles += '<div class="stat-tile"><span class="stat-label">Swimming Today</span><span class="stat-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
-    if (TODAY_ENTRY.recoveryScore) statTiles += '<div class="stat-tile"><span class="stat-label">Recovery</span><span class="stat-value">'+TODAY_ENTRY.recoveryScore+'%</span></div>';
-    if (TODAY_ENTRY.sleepMinutes) statTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m</span></div>';
-    if (TODAY_ENTRY.avgHeartRate) statTiles += '<div class="stat-tile"><span class="stat-label">Avg HR</span><span class="stat-value">'+TODAY_ENTRY.avgHeartRate+' bpm</span></div>';
-    if (TODAY_ENTRY.avgHRV) statTiles += '<div class="stat-tile"><span class="stat-label">Avg HRV</span><span class="stat-value">'+TODAY_ENTRY.avgHRV+' ms</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Cycling Today</span><span class="stat-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
+    if (TODAY_ENTRY.swimmingMiles!=null) statTiles += '<div class="stat-tile"><span class="stat-label">Swimming Today</span><span class="stat-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Recovery</span><span class="stat-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+(TODAY_ENTRY.sleepMinutes!=null?Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m':pending)+'</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Avg HR</span><span class="stat-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Avg HRV</span><span class="stat-value">'+(TODAY_ENTRY.avgHRV!=null?TODAY_ENTRY.avgHRV+' ms':pending)+'</span></div>';
     document.getElementById('latestStats').innerHTML = statTiles;
 
     var ritualsEl = document.getElementById('latestRituals');
@@ -799,7 +800,7 @@ function boot(sanityData){
   /* ---- Progress: chart with on-pace target ---- */
   (function(){
     var cum = []; var run = 0; var activeDayCount = 0;
-    DAILY_ENTRIES.forEach(function(e){ run += e.cyclingMiles; cum.push(run); if(e.cyclingMiles>0) activeDayCount++; });
+    DAILY_ENTRIES.forEach(function(e){ run += (e.cyclingMiles||0); cum.push(run); if(e.cyclingMiles>0) activeDayCount++; });
     var TARGET_PER_DAY = 100;
     var target = DAILY_ENTRIES.map(function(e,i){ return TARGET_PER_DAY*(i+1); });
 
@@ -825,7 +826,7 @@ function boot(sanityData){
 
     var remainingMiles = TOTAL_TARGET_MILES - totalCycled;
     var activeDays7 = DAILY_ENTRIES.slice(-7).filter(function(e){return e.cyclingMiles>0;});
-    var recentAvg = activeDays7.length ? Math.round(activeDays7.reduce(function(a,e){return a+e.cyclingMiles;},0)/activeDays7.length) : 0;
+    var recentAvg = activeDays7.length ? Math.round(activeDays7.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/activeDays7.length) : 0;
     var avgPerActiveDay = activeDayCount ? Math.round(totalCycled/activeDayCount) : 0;
     document.getElementById('paceText').textContent = avgPerActiveDay >= TARGET_PER_DAY
       ? 'Averaging ' + avgPerActiveDay + ' mi on active days - ahead of the ' + TARGET_PER_DAY + ' mi/day target. ' + remainingMiles.toLocaleString('en-GB') + ' miles to go.'
@@ -876,7 +877,7 @@ function boot(sanityData){
     } else {
       var high = DAILY_ENTRIES.filter(function(e){ return e.ritualsCompleted.length >= 3; });
       var low = DAILY_ENTRIES.filter(function(e){ return e.ritualsCompleted.length < 3; });
-      var avg = function(list){ return list.reduce(function(a,e){return a+e.cyclingMiles;},0) / (list.length||1); };
+      var avg = function(list){ return list.reduce(function(a,e){return a+(e.cyclingMiles||0);},0) / (list.length||1); };
       if (high.length && low.length){
         var diff = Math.round(avg(high) - avg(low));
         patternText = diff > 0 ? 'Daily mileage runs ' + diff + ' mi higher on days with 3 or more Sisu rituals complete.' : 'Rituals and mileage are still finding their rhythm.';
@@ -894,9 +895,7 @@ function boot(sanityData){
       var card = document.createElement('div');
       card.className = 'rider-card';
       var guestAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
-      var metaHtml = g.stageComplete
-        ? '<div class="rider-meta"><span>'+g.miles+' mi stage</span><span>'+g.contribPct+'% of route</span><span>Day '+g.joinDay+'</span></div>'
-        : '<div class="rider-meta"><span>Stage in progress</span><span>Day '+g.joinDay+'</span></div>';
+      var metaHtml = '<div class="rider-meta"><span>'+(g.miles!=null?g.miles+' mi stage':'—')+'</span><span>'+g.contribPct+'% of route</span><span>Day '+g.joinDay+'</span></div>';
       var quoteHtml = g.note ? '<p class="rider-quote">"'+g.note+'"</p>' : '';
       card.innerHTML =
         '<div class="rider-card-head"><span class="avatar">'+guestAvatar+'</span><div><div class="name">'+g.name+'</div></div></div>'+
@@ -911,8 +910,8 @@ function boot(sanityData){
   (function(){
     var list = document.getElementById('archiveList');
     DAILY_ENTRIES.slice().reverse().forEach(function(e){
-      var sleepLabel = Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m';
-      var distLabel = e.swimmingMiles>0 ? (e.cyclingMiles+' mi + '+e.swimmingMiles+' mi swim') : (e.cyclingMiles+' mi');
+      var sleepLabel = e.sleepMinutes!=null ? Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m' : '';
+      var distLabel = e.cyclingMiles!=null ? (e.swimmingMiles>0 ? (e.cyclingMiles+' mi + '+e.swimmingMiles+' mi swim') : (e.cyclingMiles+' mi')) : 'Data pending';
       var guestLine = '';
       if (e.ridingTodayGuestId){
         var g = GUESTS.find(function(x){ return x.id===e.ridingTodayGuestId; });
@@ -927,8 +926,8 @@ function boot(sanityData){
       var det = document.createElement('details');
       det.className = 'day-entry';
       var sumParts = [];
-      if (e.recoveryScore) sumParts.push(e.recoveryScore+'% recovery');
-      sumParts.push(e.ritualsCompleted.length+'/'+RITUALS.length+' sisu rituals');
+      if (e.recoveryScore!=null) sumParts.push(e.recoveryScore+'% recovery');
+      sumParts.push((e.ritualsCompleted||[]).length+'/'+RITUALS.length+' sisu rituals');
       det.innerHTML =
         '<summary>'+
           '<span class="sum-date">'+MONTHS[e.date.getMonth()]+' '+e.date.getDate()+'</span>'+
@@ -936,13 +935,14 @@ function boot(sanityData){
           '<span class="sum-meta">'+sumParts.join(' · ')+'</span>'+
           '<svg class="sum-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>'+
         '</summary>';
+      var dp = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
       var detailTiles = '';
-      if (e.cyclingMiles) detailTiles += '<div class="stat-tile"><span class="stat-label">Cycling</span><span class="stat-value">'+e.cyclingMiles+' mi</span></div>';
-      if (e.swimmingMiles) detailTiles += '<div class="stat-tile"><span class="stat-label">Swimming</span><span class="stat-value">'+e.swimmingMiles+' mi</span></div>';
-      if (e.recoveryScore) detailTiles += '<div class="stat-tile"><span class="stat-label">Recovery</span><span class="stat-value">'+e.recoveryScore+'%</span></div>';
-      if (e.sleepMinutes) detailTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+sleepLabel+'</span></div>';
-      if (e.avgHeartRate) detailTiles += '<div class="stat-tile"><span class="stat-label">Avg HR</span><span class="stat-value">'+e.avgHeartRate+' bpm</span></div>';
-      if (e.avgHRV) detailTiles += '<div class="stat-tile"><span class="stat-label">Avg HRV</span><span class="stat-value">'+e.avgHRV+' ms</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Cycling</span><span class="stat-value">'+(e.cyclingMiles!=null?e.cyclingMiles+' mi':dp)+'</span></div>';
+      if (e.swimmingMiles!=null) detailTiles += '<div class="stat-tile"><span class="stat-label">Swimming</span><span class="stat-value">'+e.swimmingMiles+' mi</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Recovery</span><span class="stat-value">'+(e.recoveryScore!=null?e.recoveryScore+'%':dp)+'</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+(sleepLabel||dp)+'</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Avg HR</span><span class="stat-value">'+(e.avgHeartRate!=null?e.avgHeartRate+' bpm':dp)+'</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Avg HRV</span><span class="stat-value">'+(e.avgHRV!=null?e.avgHRV+' ms':dp)+'</span></div>';
       detailTiles += guestLine;
       det.innerHTML +=
         '<div class="day-detail">'+

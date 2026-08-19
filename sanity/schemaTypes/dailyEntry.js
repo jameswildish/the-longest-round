@@ -22,13 +22,11 @@ export default defineType({
       name: 'cyclingMiles',
       title: 'Cycling Miles',
       type: 'number',
-      validation: (r) => r.required().min(0),
     }),
     defineField({
       name: 'swimmingMiles',
       title: 'Swimming Miles',
       type: 'number',
-      initialValue: 0,
       description: 'Only set on the two crossing days (Channel, Strait of Gibraltar).',
     }),
     defineField({

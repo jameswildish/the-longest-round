@@ -583,7 +583,7 @@ function boot(sanityData){
   });
 
   var TODAY_ENTRY = DAILY_ENTRIES[DAILY_ENTRIES.length-1];
-  var totalCycled = DAILY_ENTRIES.reduce(function(a,e){return a+(e.dayComplete?e.cyclingMiles:0);},0);
+  var totalCycled = DAILY_ENTRIES.reduce(function(a,e){return a+(e.dayComplete&&e.cyclingMiles?e.cyclingMiles:0);},0);
 
   /* ================================================================== */
 
@@ -704,19 +704,20 @@ function boot(sanityData){
 
     var swimsDoneInsight = DAILY_ENTRIES.filter(function(e){ return e.swimmingMiles > 0; }).length;
     var last7 = DAILY_ENTRIES.slice(-7);
-    var avg7 = Math.round(last7.reduce(function(a,e){return a+e.cyclingMiles;},0)/last7.length);
+    var avg7 = Math.round(last7.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/last7.length);
     document.getElementById('leadInsight').textContent =
       totalCycled + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDoneInsight + ' of 2 swims complete.';
 
     var grid = document.getElementById('todayMetricGrid');
     var swimsDoneEntries = DAILY_ENTRIES.filter(function(e){ return e.swimmingMiles > 0; }).length;
+    var pending = '<span style="color:var(--ink-faint);font-size:13px;">Data pending</span>';
     var tiles = '';
-    if (TODAY_ENTRY.cyclingMiles) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling Today</span></div><span class="metric-value">'+TODAY_ENTRY.cyclingMiles+' mi</span></div>';
-    if (TODAY_ENTRY.swimmingMiles) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming Today</span></div><span class="metric-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
-    if (TODAY_ENTRY.recoveryScore) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recovery</span></div><span class="metric-value">'+TODAY_ENTRY.recoveryScore+'%</span></div>';
-    if (TODAY_ENTRY.sleepMinutes) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m</span></div>';
-    if (TODAY_ENTRY.avgHeartRate) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HR</span></div><span class="metric-value">'+TODAY_ENTRY.avgHeartRate+' bpm</span></div>';
-    if (TODAY_ENTRY.avgHRV) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HRV</span></div><span class="metric-value">'+TODAY_ENTRY.avgHRV+' ms</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling Today</span></div><span class="metric-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
+    if (TODAY_ENTRY.swimmingMiles!=null) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming Today</span></div><span class="metric-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recovery</span></div><span class="metric-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+(TODAY_ENTRY.sleepMinutes!=null?Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HR</span></div><span class="metric-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HRV</span></div><span class="metric-value">'+(TODAY_ENTRY.avgHRV!=null?TODAY_ENTRY.avgHRV+' ms':pending)+'</span></div>';
     grid.innerHTML = tiles;
 
     var guestCard = document.getElementById('guestOfDayCard');
@@ -829,21 +830,21 @@ function boot(sanityData){
       var dots = RITUALS.map(function(r){ return '<span class="'+(isRitualDone(e.day,r.id)?'on':'')+'"></span>'; }).join('');
       var row = document.createElement('div');
       row.className = 'log-row';
-      var sleepLabel = Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m';
-      var distLabel = e.swimmingMiles>0 ? (e.cyclingMiles+' mi + '+e.swimmingMiles+' mi swim') : (e.cyclingMiles+' mi');
-      var hrNote = '';
-      if (e.avgHeartRate) hrNote += ' · '+e.avgHeartRate+' bpm';
-      if (e.avgHRV) hrNote += ' · '+e.avgHRV+' ms HRV';
-      var guestNote = '';
+      var sleepLabel = e.sleepMinutes!=null ? Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m sleep' : '';
+      var distLabel = e.cyclingMiles!=null ? (e.swimmingMiles>0 ? (e.cyclingMiles+' mi + '+e.swimmingMiles+' mi swim') : (e.cyclingMiles+' mi')) : 'Data pending';
+      var recoveryLabel = e.recoveryScore!=null ? e.recoveryScore+'% recovery' : '';
+      var metaParts = [sleepLabel, recoveryLabel, (getRitualState()[e.day]||[]).length+'/'+RITUALS.length+' rituals'].filter(function(s){return s;});
+      if (e.avgHeartRate) metaParts.push(e.avgHeartRate+' bpm');
+      if (e.avgHRV) metaParts.push(e.avgHRV+' ms HRV');
       if (e.ridingTodayGuestId){
         var eg = GUESTS.find(function(x){ return x.id===e.ridingTodayGuestId; });
-        if (eg) guestNote = ' · Joined by ' + eg.name;
+        if (eg) metaParts.push('Joined by ' + eg.name);
       }
       var photoBadge = e.journalPhoto ? '<svg class="log-photo-badge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="2.5"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.4-2h5.2L16 6"/></svg>' : '';
       row.innerHTML =
         '<div class="log-date"><span class="log-day">'+e.date.getDate()+'</span><span class="log-mon">'+MONTHS[e.date.getMonth()]+'</span></div>'+
         '<div class="log-mid"><span class="log-score">'+distLabel+(e===TODAY_ENTRY?' · Today':'')+photoBadge+'</span>'+
-        '<span class="log-meta">'+sleepLabel+' sleep · '+e.recoveryScore+'% recovery · '+(getRitualState()[e.day]||[]).length+'/'+RITUALS.length+' rituals'+hrNote+guestNote+'</span></div>'+
+        '<span class="log-meta">'+metaParts.join(' · ')+'</span></div>'+
         '<div class="log-dots">'+dots+'</div>';
       row.addEventListener('click', function(){ openDaySheet(e); });
       logList.appendChild(row);
@@ -856,7 +857,7 @@ function boot(sanityData){
   /* ---- Insights: all-time cumulative chart, with an on-pace target overlay ---- */
   (function(){
     var cum = []; var run = 0;
-    DAILY_ENTRIES.forEach(function(e){ run += e.cyclingMiles; cum.push(run); });
+    DAILY_ENTRIES.forEach(function(e){ run += (e.cyclingMiles||0); cum.push(run); });
     var target = DAILY_ENTRIES.map(function(e,i){ return TARGET_PER_DAY*(i+1); });
 
     document.getElementById('chartCallout').innerHTML = totalCycled.toLocaleString('en-GB')+'<span>Miles Cycled · All-Time</span>';
@@ -942,7 +943,7 @@ function boot(sanityData){
       var ritStateInsight = getRitualState();
       var high = DAILY_ENTRIES.filter(function(e){ return (ritStateInsight[e.day]||[]).length >= 3; });
       var low = DAILY_ENTRIES.filter(function(e){ return (ritStateInsight[e.day]||[]).length < 3; });
-      var avg = function(list){ return list.reduce(function(a,e){return a+e.cyclingMiles;},0) / (list.length||1); };
+      var avg = function(list){ return list.reduce(function(a,e){return a+(e.cyclingMiles||0);},0) / (list.length||1); };
       if (high.length && low.length){
         var diff = Math.round(avg(high) - avg(low));
         text = diff > 0
@@ -962,12 +963,13 @@ function boot(sanityData){
     document.getElementById('sheetDateLabel').textContent = MONTHS[entry.date.getMonth()] + ' ' + entry.date.getDate();
 
     var sheetTiles = '';
-    if (entry.cyclingMiles) sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling</span></div><span class="metric-value">'+entry.cyclingMiles+' mi</span></div>';
-    if (entry.swimmingMiles) sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming</span></div><span class="metric-value">'+entry.swimmingMiles+' mi</span></div>';
-    if (entry.recoveryScore) sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recovery</span></div><span class="metric-value">'+entry.recoveryScore+'%</span></div>';
-    if (entry.sleepMinutes) sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+Math.floor(entry.sleepMinutes/60)+'h '+(entry.sleepMinutes%60)+'m</span></div>';
-    if (entry.avgHeartRate) sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HR</span></div><span class="metric-value">'+entry.avgHeartRate+' bpm</span></div>';
-    if (entry.avgHRV) sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HRV</span></div><span class="metric-value">'+entry.avgHRV+' ms</span></div>';
+    var sp = '<span style="color:var(--ink-faint);font-size:13px;">Data pending</span>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling</span></div><span class="metric-value">'+(entry.cyclingMiles!=null?entry.cyclingMiles+' mi':sp)+'</span></div>';
+    if (entry.swimmingMiles!=null) sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming</span></div><span class="metric-value">'+entry.swimmingMiles+' mi</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recovery</span></div><span class="metric-value">'+(entry.recoveryScore!=null?entry.recoveryScore+'%':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+(entry.sleepMinutes!=null?Math.floor(entry.sleepMinutes/60)+'h '+(entry.sleepMinutes%60)+'m':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HR</span></div><span class="metric-value">'+(entry.avgHeartRate!=null?entry.avgHeartRate+' bpm':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg HRV</span></div><span class="metric-value">'+(entry.avgHRV!=null?entry.avgHRV+' ms':sp)+'</span></div>';
     document.getElementById('sheetMetricGrid').innerHTML = sheetTiles;
 
     var guestCard = document.getElementById('sheetGuestCard');
