@@ -443,9 +443,8 @@
               <span>Polar</span>
               <span class="status-pill connected">Connected</span>
             </div>
-            <p class="source-sync">Synced via BiotrackOS</p>
-            <div class="chip-row">
-              <span class="chip">Heart Rate</span><span class="chip">Heart Rate Variability</span><span class="chip">Sleep</span>
+                        <div class="chip-row">
+              <span class="chip">Heart Rate</span><span class="chip">Heart Rate Variability</span><span class="chip">Sleep</span><span class="chip">Activity</span>
             </div>
           </div>
 
@@ -455,13 +454,12 @@
               <span>Wahoo</span>
               <span class="status-pill connected">Connected</span>
             </div>
-            <p class="source-sync">Synced via BiotrackOS</p>
-            <div class="chip-row">
+                        <div class="chip-row">
               <span class="chip">Cycling Distance</span><span class="chip">Speed</span><span class="chip">Duration</span>
             </div>
           </div>
 
-          <p class="footnote">Live sync is powered by BiotrackOS so data can be ingested from connected devices.</p>
+          <p class="footnote">Data sync is powered by BiotrackOS so data can be ingested from connected devices.</p>
         </section>
 
       </div>
@@ -913,20 +911,34 @@ function boot(sanityData){
 
   /* ---- Insights: Personal Bests ---- */
   (function(){
+    var pendingHtml = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
     function best(key, label, fmt){
-      var winner = DAILY_ENTRIES.reduce(function(a,b){ return b[key] > a[key] ? b : a; });
+      var filtered = DAILY_ENTRIES.filter(function(e){ return e[key]!=null; });
+      if (!filtered.length) return {label:label, value:pendingHtml, date:''};
+      var winner = filtered.reduce(function(a,b){ return b[key] > a[key] ? b : a; });
       return {label:label, value:fmt(winner), date: (winner===TODAY_ENTRY ? 'Today' : MONTHS[winner.date.getMonth()]+' '+winner.date.getDate())};
     }
+    var completeDays = DAILY_ENTRIES.filter(function(e){ return e.dayComplete; });
+    var hrEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHeartRate; });
+    var avgHR = hrEntries.length ? Math.round(hrEntries.reduce(function(a,e){return a+e.avgHeartRate;},0)/hrEntries.length) : 0;
+    var hrvEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHRV; });
+    var avgHRV = hrvEntries.length ? Math.round(hrvEntries.reduce(function(a,e){return a+e.avgHRV;},0)/hrvEntries.length) : 0;
+    var avgMiles = completeDays.length ? Math.round(totalCycled / completeDays.length) : 0;
     var bests = [
       best('cyclingMiles', 'Longest Ride', function(e){ return e.cyclingMiles+' mi'; }),
-      best('recoveryScore', 'Peak Recharge', function(e){ return e.recoveryScore+'%'; }),
-      best('sleepMinutes', 'Best Sleep', function(e){ return Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m'; })
+      best('recoveryScore', 'Peak Recharge %', function(e){ return e.recoveryScore+'%'; }),
+      best('sleepMinutes', 'Best Sleep', function(e){ return Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m'; }),
+      {label:'Avg Daily Miles', value:completeDays.length ? avgMiles+' mi' : pendingHtml, date:''},
+      best('avgHeartRate', 'Peak Activity HR', function(e){ return e.avgHeartRate+' bpm'; }),
+      {label:'Avg Activity HR', value:hrEntries.length ? avgHR+' bpm' : pendingHtml, date:''},
+      best('avgHRV', 'Best Morning HRV', function(e){ return e.avgHRV+' ms'; }),
+      {label:'Avg Morning HRV', value:hrvEntries.length ? avgHRV+' ms' : pendingHtml, date:''}
     ];
     var grid = document.getElementById('bestsGrid');
     bests.forEach(function(b){
       var tile = document.createElement('div');
       tile.className = 'best-tile';
-      tile.innerHTML = '<span class="best-label">'+b.label+'</span><span class="best-value">'+b.value+'</span><span class="best-date">'+b.date+'</span>';
+      tile.innerHTML = '<span class="best-label">'+b.label+'</span><span class="best-value">'+b.value+'</span>'+(b.date?'<span class="best-date">'+b.date+'</span>':'');
       grid.appendChild(tile);
     });
   })();
