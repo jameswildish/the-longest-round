@@ -3,6 +3,7 @@
   "outputDirectory": "output",
   "installCommand": "echo skip",
   "framework": null,
+  "cleanUrls": true,
   "rewrites": [
     { "source": "/studio/(.*)", "destination": "/studio/index.html" },
     { "source": "/studio", "destination": "/studio/index.html" }
