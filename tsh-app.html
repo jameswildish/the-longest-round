@@ -704,7 +704,7 @@ function boot(sanityData){
     var last7 = DAILY_ENTRIES.slice(-7);
     var avg7 = Math.round(last7.reduce(function(a,e){return a+(e.cyclingMiles||0)+(e.swimmingMiles||0);},0)/last7.length);
     document.getElementById('leadInsight').textContent =
-      totalCycled + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDoneInsight + ' of 2 swims complete.';
+      totalCycled.toLocaleString('en-GB') + ' miles travelled - averaging ' + avg7 + ' mi/day, with ' + swimsDoneInsight + ' of 2 swims complete.';
 
     var grid = document.getElementById('todayMetricGrid');
     var swimsDoneEntries = DAILY_ENTRIES.filter(function(e){ return e.swimmingMiles > 0; }).length;
