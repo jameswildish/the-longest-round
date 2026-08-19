@@ -173,7 +173,7 @@
   .area-fill{fill:url(#auroraFillWeb);}
   .area-line{fill:none;stroke:var(--aurora);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
   .area-target{fill:none;stroke:var(--ink-faint);stroke-width:1.6;stroke-dasharray:5 5;opacity:.85;}
-  .area-end{fill:var(--ground);stroke:var(--aurora);stroke-width:3;}
+  .area-end{fill:var(--aurora);stroke:none;}
   .chart-legend{display:flex;gap:20px;margin-top:14px;padding-top:14px;border-top:1px solid var(--hairline);}
   .chart-legend span{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink-faint);}
   .chart-legend i{width:12px;height:2.5px;border-radius:2px;display:inline-block;}
@@ -416,7 +416,7 @@ document.getElementById('siteNav').addEventListener('click',function(e){
           <path class="area-fill" id="areaFill" d=""/>
           <path class="area-target" id="areaTarget" d=""/>
           <path class="area-line" id="areaLine" d=""/>
-          <circle class="area-end" id="areaEnd" cx="0" cy="0" r="5"/>
+          <circle class="area-end" id="areaEnd" cx="0" cy="0" r="3.5"/>
         </svg>
         <div class="chart-legend">
           <span><i class="dot-actual"></i>Actual</span>
@@ -833,6 +833,8 @@ function boot(sanityData){
     var last = pts[pts.length-1];
     var fill = line+' L'+last[0]+','+chartH+' L'+origin[0]+','+chartH+' Z';
     document.getElementById('areaTarget').setAttribute('d', targetLine);
+    document.getElementById('areaEnd').setAttribute('cx', origin[0]);
+    document.getElementById('areaEnd').setAttribute('cy', origin[1]);
     if (totalCycled > 0) {
       document.getElementById('areaLine').setAttribute('d', line);
       document.getElementById('areaFill').setAttribute('d', fill);

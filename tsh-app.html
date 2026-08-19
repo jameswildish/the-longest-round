@@ -160,7 +160,7 @@
   .area-chart{width:100%;height:120px;display:block;overflow:visible;}
   .area-fill{fill:url(#auroraFill);}
   .area-line{fill:none;stroke:var(--aurora);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
-  .area-end{fill:var(--ground);stroke:var(--aurora);stroke-width:3;}
+  .area-end{fill:var(--aurora);stroke:none;}
   .area-target{stroke:var(--ink-faint);stroke-width:1.6;stroke-dasharray:4 4;opacity:.85;}
   .chart-callout{position:absolute;top:16px;right:18px;text-align:right;font-family:var(--font-display);font-weight:700;font-size:19px;text-transform:uppercase;}
   .chart-callout span{display:block;font-family:var(--font-body);font-weight:600;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);}
@@ -371,7 +371,7 @@
                 <path class="area-fill" id="areaFill" d=""/>
                 <path class="area-target" id="areaTarget" d="" fill="none"/>
                 <path class="area-line" id="areaLine" d=""/>
-                <circle class="area-end" id="areaEnd" cx="0" cy="0" r="4"/>
+                <circle class="area-end" id="areaEnd" cx="0" cy="0" r="3.5"/>
               </svg>
               <div class="chart-legend">
                 <span><i class="dot-actual"></i>Actual</span>
@@ -877,6 +877,8 @@ function boot(sanityData){
     var last = pts[pts.length-1];
     var fill = line+' L'+last[0]+','+chartH+' L'+origin[0]+','+chartH+' Z';
     document.getElementById('areaTarget').setAttribute('d', targetLine);
+    document.getElementById('areaEnd').setAttribute('cx', origin[0]);
+    document.getElementById('areaEnd').setAttribute('cy', origin[1]);
     if (totalCycled > 0) {
       document.getElementById('areaLine').setAttribute('d', line);
       document.getElementById('areaFill').setAttribute('d', fill);
