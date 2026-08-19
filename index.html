@@ -832,11 +832,13 @@ function boot(sanityData){
     var line = 'M'+pts.map(function(p){return p[0]+','+p[1];}).join(' L');
     var last = pts[pts.length-1];
     var fill = line+' L'+last[0]+','+chartH+' L'+origin[0]+','+chartH+' Z';
-    document.getElementById('areaLine').setAttribute('d', line);
     document.getElementById('areaTarget').setAttribute('d', targetLine);
-    document.getElementById('areaFill').setAttribute('d', fill);
-    document.getElementById('areaEnd').setAttribute('cx', last[0]);
-    document.getElementById('areaEnd').setAttribute('cy', last[1]);
+    if (totalCycled > 0) {
+      document.getElementById('areaLine').setAttribute('d', line);
+      document.getElementById('areaFill').setAttribute('d', fill);
+      document.getElementById('areaEnd').setAttribute('cx', last[0]);
+      document.getElementById('areaEnd').setAttribute('cy', last[1]);
+    }
     }
 
     var remainingMiles = TOTAL_TARGET_MILES - totalCycled;
