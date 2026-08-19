@@ -207,6 +207,11 @@
   .rider-card .role{font-size:12px;color:var(--ink-faint);line-height:1.4;}
   .rider-stage{font-size:12.5px;color:var(--aurora-strong);font-weight:600;}
   .rider-quote{font-size:13px;line-height:1.55;color:var(--ink-dim);font-style:italic;margin:0;}
+  .rider-card.placeholder{opacity:.45;border-style:dashed;pointer-events:none;}
+  .rider-card.placeholder .avatar{background:transparent;border-color:var(--ink-faint);}
+  .rider-card.placeholder .silhouette{width:22px;height:22px;opacity:.5;}
+  .rider-card.placeholder .name{color:var(--ink-faint);}
+  .rider-card.placeholder .rider-stage{color:var(--ink-faint);}
   .rider-meta{display:flex;gap:14px;font-size:11px;color:var(--ink-faint);border-top:1px solid var(--hairline);padding-top:12px;}
 
   /* ---- Archive ---- */
@@ -891,19 +896,31 @@ function boot(sanityData){
   /* ---- Team ---- */
   (function(){
     var grid = document.getElementById('riderGrid');
-    GUESTS.forEach(function(g){
-      var card = document.createElement('div');
-      card.className = 'rider-card';
-      var guestAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
-      var metaHtml = '<div class="rider-meta"><span>Day '+g.joinDay+'</span><span>'+(g.miles!=null?g.miles+' mi stage':'—')+'</span><span>'+g.contribPct+'% of route</span></div>';
-      var quoteHtml = g.note ? '<p class="rider-quote">"'+g.note+'"</p>' : '';
-      card.innerHTML =
-        '<div class="rider-card-head"><span class="avatar">'+guestAvatar+'</span><div><div class="name">'+g.name+'</div></div></div>'+
-        '<span class="rider-stage">'+g.stage+'</span>'+
-        quoteHtml+
-        metaHtml;
-      grid.appendChild(card);
-    });
+    var silhouetteSvg = '<svg class="silhouette" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4"/><path d="M12 14c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z"/></svg>';
+    if (GUESTS.length === 0) {
+      for (var i = 0; i < 3; i++) {
+        var ph = document.createElement('div');
+        ph.className = 'rider-card placeholder';
+        ph.innerHTML =
+          '<div class="rider-card-head"><span class="avatar">'+silhouetteSvg+'</span><div><div class="name">Announcing soon</div></div></div>'+
+          '<span class="rider-stage">Guest rider</span>';
+        grid.appendChild(ph);
+      }
+    } else {
+      GUESTS.forEach(function(g){
+        var card = document.createElement('div');
+        card.className = 'rider-card';
+        var guestAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
+        var metaHtml = '<div class="rider-meta"><span>Day '+g.joinDay+'</span><span>'+(g.miles!=null?g.miles+' mi stage':'—')+'</span><span>'+g.contribPct+'% of route</span></div>';
+        var quoteHtml = g.note ? '<p class="rider-quote">"'+g.note+'"</p>' : '';
+        card.innerHTML =
+          '<div class="rider-card-head"><span class="avatar">'+guestAvatar+'</span><div><div class="name">'+g.name+'</div></div></div>'+
+          '<span class="rider-stage">'+g.stage+'</span>'+
+          quoteHtml+
+          metaHtml;
+        grid.appendChild(card);
+      });
+    }
   })();
 
   /* ---- Archive: every day, expandable ---- */
