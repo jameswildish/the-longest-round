@@ -768,9 +768,9 @@ function boot(sanityData){
     var statTiles = '';
     statTiles += '<div class="stat-tile"><span class="stat-label">Cycling Today</span><span class="stat-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
     if (TODAY_ENTRY.swimmingMiles!=null) statTiles += '<div class="stat-tile"><span class="stat-label">Swimming Today</span><span class="stat-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
-    statTiles += '<div class="stat-tile"><span class="stat-label">Recharge</span><span class="stat-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Recharge %</span><span class="stat-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
     statTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+(TODAY_ENTRY.sleepMinutes!=null?Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m':pending)+'</span></div>';
-    statTiles += '<div class="stat-tile"><span class="stat-label">Activity HR</span><span class="stat-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Activity HR (avg)</span><span class="stat-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';
     statTiles += '<div class="stat-tile"><span class="stat-label">Morning HRV</span><span class="stat-value">'+(TODAY_ENTRY.avgHRV!=null?TODAY_ENTRY.avgHRV+' ms':pending)+'</span></div>';
     document.getElementById('latestStats').innerHTML = statTiles;
 
@@ -867,7 +867,7 @@ function boot(sanityData){
     var hrEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHeartRate; });
     if (hrEntries.length) {
       var avgHR = Math.round(hrEntries.reduce(function(a,e){return a+e.avgHeartRate;},0)/hrEntries.length);
-      bests.push({label:'Activity HR', value:avgHR+' bpm'});
+      bests.push({label:'Activity HR (avg)', value:avgHR+' bpm'});
     }
     var hrvEntries = DAILY_ENTRIES.filter(function(e){ return e.avgHRV; });
     if (hrvEntries.length) {
@@ -957,9 +957,9 @@ function boot(sanityData){
       var detailTiles = '';
       detailTiles += '<div class="stat-tile"><span class="stat-label">Cycling</span><span class="stat-value">'+(e.cyclingMiles!=null?e.cyclingMiles+' mi':dp)+'</span></div>';
       if (e.swimmingMiles!=null) detailTiles += '<div class="stat-tile"><span class="stat-label">Swimming</span><span class="stat-value">'+e.swimmingMiles+' mi</span></div>';
-      detailTiles += '<div class="stat-tile"><span class="stat-label">Recharge</span><span class="stat-value">'+(e.recoveryScore!=null?e.recoveryScore+'%':dp)+'</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Recharge %</span><span class="stat-value">'+(e.recoveryScore!=null?e.recoveryScore+'%':dp)+'</span></div>';
       detailTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+(sleepLabel||dp)+'</span></div>';
-      detailTiles += '<div class="stat-tile"><span class="stat-label">Activity HR</span><span class="stat-value">'+(e.avgHeartRate!=null?e.avgHeartRate+' bpm':dp)+'</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Activity HR (avg)</span><span class="stat-value">'+(e.avgHeartRate!=null?e.avgHeartRate+' bpm':dp)+'</span></div>';
       detailTiles += '<div class="stat-tile"><span class="stat-label">Morning HRV</span><span class="stat-value">'+(e.avgHRV!=null?e.avgHRV+' ms':dp)+'</span></div>';
       detailTiles += guestLine;
       det.innerHTML +=
