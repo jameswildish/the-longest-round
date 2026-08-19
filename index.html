@@ -759,10 +759,11 @@ function boot(sanityData){
     var curStop = ROUTE_STOPS.find(function(s){ return s.order===currentStopOrder(); });
     document.getElementById('latestHeading').textContent = 'Day ' + TODAY_ENTRY.day + ' - near ' + curStop.name;
     var swimStops = ROUTE_STOPS.filter(function(s){ return s.type==='swim'; });
+    var totalSwims = swimStops.length || 2;
     var swimsDone = swimStops.filter(function(s){ return s.arrivalOffsetDays<=0; }).length;
     var last7 = DAILY_ENTRIES.slice(-7);
     var avg7 = Math.round(last7.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/last7.length);
-    document.getElementById('latestSub').textContent = totalCycled.toLocaleString('en-GB') + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + swimStops.length + ' swims complete.';
+    document.getElementById('latestSub').textContent = totalCycled.toLocaleString('en-GB') + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + totalSwims + ' swims complete.';
 
     var pending = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
     var statTiles = '';
