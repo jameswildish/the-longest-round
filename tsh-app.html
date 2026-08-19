@@ -712,8 +712,8 @@ function boot(sanityData){
     var swimsDoneEntries = DAILY_ENTRIES.filter(function(e){ return e.swimmingMiles > 0; }).length;
     var pending = '<span style="color:var(--ink-faint);font-size:13px;">Data pending</span>';
     var tiles = '';
-    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling Today</span></div><span class="metric-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
-    if (TODAY_ENTRY.swimmingMiles!=null) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming Today</span></div><span class="metric-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling</span></div><span class="metric-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
+    if (TODAY_ENTRY.swimmingMiles!=null) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming</span></div><span class="metric-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
     tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recharge %</span></div><span class="metric-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
     tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+(TODAY_ENTRY.sleepMinutes!=null?Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m':pending)+'</span></div>';
     tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Activity HR (avg)</span></div><span class="metric-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';

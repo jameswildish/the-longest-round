@@ -766,8 +766,8 @@ function boot(sanityData){
 
     var pending = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
     var statTiles = '';
-    statTiles += '<div class="stat-tile"><span class="stat-label">Cycling Today</span><span class="stat-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
-    if (TODAY_ENTRY.swimmingMiles!=null) statTiles += '<div class="stat-tile"><span class="stat-label">Swimming Today</span><span class="stat-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Cycling</span><span class="stat-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
+    if (TODAY_ENTRY.swimmingMiles!=null) statTiles += '<div class="stat-tile"><span class="stat-label">Swimming</span><span class="stat-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
     statTiles += '<div class="stat-tile"><span class="stat-label">Recharge %</span><span class="stat-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
     statTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+(TODAY_ENTRY.sleepMinutes!=null?Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m':pending)+'</span></div>';
     statTiles += '<div class="stat-tile"><span class="stat-label">Activity HR (avg)</span><span class="stat-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';
