@@ -574,8 +574,11 @@ function boot(sanityData){
   var LEAD = { id:'darren', initials:(leadDoc&&leadDoc.initials)||'DB', name:(leadDoc&&leadDoc.name)||'Darren Barker', profilePic:(leadDoc&&leadDoc.profilePic)||'' };
 
   ROUTE_STOPS.forEach(function(s){
-    if (s.arrivalOffsetDays===undefined && s.arrivalTime){
-      s.arrivalOffsetDays = Math.round((new Date(s.arrivalTime) - today) / 86400000);
+    if (s.arrivalTime){
+      s.arrivalDate = new Date(s.arrivalTime);
+      if (s.arrivalOffsetDays===undefined){
+        s.arrivalOffsetDays = Math.round((s.arrivalDate - today) / 86400000);
+      }
     }
   });
   DAILY_ENTRIES.forEach(function(e){
@@ -747,7 +750,7 @@ function boot(sanityData){
       var isDone = node.order < curOrder, isCurrent = node.order === curOrder;
       var row = document.createElement('div');
       row.className = 'stop-row' + (isDone?' done':'') + (isCurrent?' current':'');
-      var d = addDays(node.arrivalOffsetDays);
+      var d = node.arrivalDate || addDays(node.arrivalOffsetDays);
       var when = MONTHS[d.getMonth()]+' '+d.getDate();
       row.innerHTML = '<span class="stop-dot"></span><span class="stop-name">'+node.name+(node.type==='swim'?' Swim':'')+'</span><span class="stop-when">'+when+'</span>';
       el.appendChild(row);
