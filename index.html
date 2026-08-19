@@ -766,7 +766,7 @@ function boot(sanityData){
     var swimsDone = swimStops.filter(function(s){ return s.arrivalOffsetDays<=0; }).length;
     var last7 = DAILY_ENTRIES.slice(-7);
     var avg7 = Math.round(last7.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/last7.length);
-    document.getElementById('latestSub').textContent = totalCycled.toLocaleString('en-GB') + ' miles cycled so far - averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + totalSwims + ' swims complete.';
+    document.getElementById('latestSub').textContent = totalCycled.toLocaleString('en-GB') + ' miles travelled - averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + totalSwims + ' swims complete.';
 
     var pending = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
     var statTiles = '';
@@ -821,18 +821,22 @@ function boot(sanityData){
     if (cum.length >= 1) {
     var chartW=640, chartH=220, pad=8;
     var max = TOTAL_TARGET_MILES;
-    var stepX = (chartW-pad*2)/(TOTAL_JOURNEY_DAYS-1);
+    var stepX = (chartW-pad*2)/TOTAL_JOURNEY_DAYS;
     function toY(v){ return pad+(1-(v/max))*(chartH-pad*2-18)+10; }
-    var targetPts = target.map(function(v,i){ return [(pad+i*stepX).toFixed(1), toY(v).toFixed(1)]; });
+    var origin = [pad.toFixed(1), toY(0).toFixed(1)];
+    var targetPts = [origin];
+    target.forEach(function(v,i){ targetPts.push([(pad+(i+1)*stepX).toFixed(1), toY(v).toFixed(1)]); });
     var targetLine = 'M'+targetPts.map(function(p){return p[0]+','+p[1];}).join(' L');
-    var pts = cum.map(function(v,i){ return [(pad+i*stepX).toFixed(1), toY(v).toFixed(1)]; });
+    var pts = [origin];
+    cum.forEach(function(v,i){ pts.push([(pad+(i+1)*stepX).toFixed(1), toY(v).toFixed(1)]); });
     var line = 'M'+pts.map(function(p){return p[0]+','+p[1];}).join(' L');
-    var fill = line+' L'+pts[pts.length-1][0]+','+chartH+' L'+pts[0][0]+','+chartH+' Z';
+    var last = pts[pts.length-1];
+    var fill = line+' L'+last[0]+','+chartH+' L'+origin[0]+','+chartH+' Z';
     document.getElementById('areaLine').setAttribute('d', line);
     document.getElementById('areaTarget').setAttribute('d', targetLine);
     document.getElementById('areaFill').setAttribute('d', fill);
-    document.getElementById('areaEnd').setAttribute('cx', pts[pts.length-1][0]);
-    document.getElementById('areaEnd').setAttribute('cy', pts[pts.length-1][1]);
+    document.getElementById('areaEnd').setAttribute('cx', last[0]);
+    document.getElementById('areaEnd').setAttribute('cy', last[1]);
     }
 
     var remainingMiles = TOTAL_TARGET_MILES - totalCycled;
