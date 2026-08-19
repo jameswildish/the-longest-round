@@ -603,7 +603,7 @@ function boot(sanityData){
   });
 
   var TODAY_ENTRY = DAILY_ENTRIES[DAILY_ENTRIES.length-1];
-  var totalCycled = DAILY_ENTRIES.reduce(function(a,e){return a+(e.dayComplete&&e.cyclingMiles?e.cyclingMiles:0);},0);
+  var totalCycled = DAILY_ENTRIES.reduce(function(a,e){return a+(e.dayComplete?((e.cyclingMiles||0)+(e.swimmingMiles||0)):0);},0);
 
   function currentStopOrder(){
     var reached = ROUTE_STOPS.filter(function(s){ return s.arrivalOffsetDays <= 0; });
@@ -765,7 +765,7 @@ function boot(sanityData){
     var totalSwims = swimStops.length || 2;
     var swimsDone = swimStops.filter(function(s){ return s.arrivalOffsetDays<=0; }).length;
     var last7 = DAILY_ENTRIES.slice(-7);
-    var avg7 = Math.round(last7.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/last7.length);
+    var avg7 = Math.round(last7.reduce(function(a,e){return a+(e.cyclingMiles||0)+(e.swimmingMiles||0);},0)/last7.length);
     document.getElementById('latestSub').textContent = totalCycled.toLocaleString('en-GB') + ' miles travelled - averaging ' + avg7 + ' mi/day this week, with ' + swimsDone + ' of ' + totalSwims + ' swims complete.';
 
     var pending = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
@@ -810,7 +810,7 @@ function boot(sanityData){
   /* ---- Progress: chart with full-journey target diagonal ---- */
   (function(){
     var cum = []; var run = 0; var activeDayCount = 0;
-    DAILY_ENTRIES.forEach(function(e){ run += (e.cyclingMiles||0); cum.push(run); if(e.cyclingMiles>0) activeDayCount++; });
+    DAILY_ENTRIES.forEach(function(e){ var dayMi=(e.cyclingMiles||0)+(e.swimmingMiles||0); run+=dayMi; cum.push(run); if(dayMi>0) activeDayCount++; });
     var TARGET_PER_DAY = 100;
     var TOTAL_JOURNEY_DAYS = Math.round(TOTAL_TARGET_MILES / TARGET_PER_DAY);
     var target = [];
@@ -840,8 +840,8 @@ function boot(sanityData){
     }
 
     var remainingMiles = TOTAL_TARGET_MILES - totalCycled;
-    var activeDays7 = DAILY_ENTRIES.slice(-7).filter(function(e){return e.cyclingMiles>0;});
-    var recentAvg = activeDays7.length ? Math.round(activeDays7.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/activeDays7.length) : 0;
+    var activeDays7 = DAILY_ENTRIES.slice(-7).filter(function(e){return (e.cyclingMiles||0)+(e.swimmingMiles||0)>0;});
+    var recentAvg = activeDays7.length ? Math.round(activeDays7.reduce(function(a,e){return a+(e.cyclingMiles||0)+(e.swimmingMiles||0);},0)/activeDays7.length) : 0;
     var avgPerActiveDay = activeDayCount ? Math.round(totalCycled/activeDayCount) : 0;
     document.getElementById('paceText').textContent = avgPerActiveDay >= TARGET_PER_DAY
       ? 'Averaging ' + avgPerActiveDay + ' mi on active days - ahead of the ' + TARGET_PER_DAY + ' mi/day target. ' + remainingMiles.toLocaleString('en-GB') + ' miles to go.'
@@ -887,17 +887,18 @@ function boot(sanityData){
         patternText = 'Not enough data. Check back once more days are logged.';
       } else {
         var insights = [];
-        var avgMi = Math.round(complete.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/complete.length);
+        function eMi(e){return (e.cyclingMiles||0)+(e.swimmingMiles||0);}
+        var avgMi = Math.round(complete.reduce(function(a,e){return a+eMi(e);},0)/complete.length);
         var latest = complete[complete.length-1];
         var prev = complete[complete.length-2];
-        if (latest.cyclingMiles && prev.cyclingMiles) {
-          var trend = latest.cyclingMiles - prev.cyclingMiles;
+        if (eMi(latest) && eMi(prev)) {
+          var trend = eMi(latest) - eMi(prev);
           if (Math.abs(trend) >= 10) insights.push('Mileage '+(trend>0?'up':'down')+' '+Math.abs(Math.round(trend))+' mi from the previous day.');
         }
         var sleepDays = complete.filter(function(e){return e.sleepMinutes!=null;});
         if (sleepDays.length >= 2) {
           var bestSleep = sleepDays.reduce(function(a,b){return b.sleepMinutes>a.sleepMinutes?b:a;});
-          var bestMi = bestSleep.cyclingMiles||0;
+          var bestMi = eMi(bestSleep);
           if (bestMi >= avgMi) insights.push('Best sleep ('+Math.floor(bestSleep.sleepMinutes/60)+'h '+(bestSleep.sleepMinutes%60)+'m) coincided with '+bestMi+' mi on Day '+bestSleep.day+'.');
         }
         var recDays = complete.filter(function(e){return e.recoveryScore!=null;});
@@ -906,8 +907,8 @@ function boot(sanityData){
           var highRec = recDays.filter(function(e){return e.recoveryScore>=avgRec;});
           var lowRec = recDays.filter(function(e){return e.recoveryScore<avgRec;});
           if (highRec.length && lowRec.length) {
-            var hiMi = Math.round(highRec.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/highRec.length);
-            var loMi = Math.round(lowRec.reduce(function(a,e){return a+(e.cyclingMiles||0);},0)/lowRec.length);
+            var hiMi = Math.round(highRec.reduce(function(a,e){return a+eMi(e);},0)/highRec.length);
+            var loMi = Math.round(lowRec.reduce(function(a,e){return a+eMi(e);},0)/lowRec.length);
             if (hiMi>loMi) insights.push('Higher recharge days average '+hiMi+' mi vs '+loMi+' mi on lower recharge days.');
           }
         }
