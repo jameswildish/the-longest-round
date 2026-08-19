@@ -895,7 +895,7 @@ function boot(sanityData){
       var card = document.createElement('div');
       card.className = 'rider-card';
       var guestAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
-      var metaHtml = '<div class="rider-meta"><span>'+(g.miles!=null?g.miles+' mi stage':'—')+'</span><span>'+g.contribPct+'% of route</span><span>Day '+g.joinDay+'</span></div>';
+      var metaHtml = '<div class="rider-meta"><span>Day '+g.joinDay+'</span><span>'+(g.miles!=null?g.miles+' mi stage':'—')+'</span><span>'+g.contribPct+'% of route</span></div>';
       var quoteHtml = g.note ? '<p class="rider-quote">"'+g.note+'"</p>' : '';
       card.innerHTML =
         '<div class="rider-card-head"><span class="avatar">'+guestAvatar+'</span><div><div class="name">'+g.name+'</div></div></div>'+
