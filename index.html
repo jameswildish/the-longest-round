@@ -614,6 +614,22 @@ function boot(sanityData){
     return reached.length ? reached[reached.length-1].order : 0;
   }
 
+  function legForDate(date){
+    var from = ROUTE_STOPS[0], to = ROUTE_STOPS[ROUTE_STOPS.length-1];
+    for (var i=0;i<ROUTE_STOPS.length;i++){
+      var s = ROUTE_STOPS[i];
+      if (!s.arrivalDate) continue;
+      if (s.arrivalDate < date){ from = s; }
+      else { to = s; break; }
+    }
+    if (from === to){
+      var idx = ROUTE_STOPS.indexOf(from);
+      if (ROUTE_STOPS[idx+1]) to = ROUTE_STOPS[idx+1];
+    }
+    if (!from || !to) return '';
+    return from === to ? from.name : from.name + ' → ' + to.name;
+  }
+
   (function(){
     var remaining = TOTAL_TARGET_MILES - totalCycled;
     var el = document.getElementById('heroMilesRemaining');
@@ -977,7 +993,9 @@ function boot(sanityData){
       var photoBlock = e.journalPhoto ? '<div class="archive-photo"><img src="'+e.journalPhoto+'?w=800&auto=format" alt="Journal photo" style="width:100%;height:auto;display:block;"></div>' : '';
       var det = document.createElement('details');
       det.className = 'day-entry';
+      var legLabel = legForDate(e.date);
       var sumParts = [];
+      if (legLabel) sumParts.push(legLabel);
       if (e.recoveryScore!=null) sumParts.push(e.recoveryScore+'% recharge');
       sumParts.push((e.ritualsCompleted||[]).length+'/'+RITUALS.length+' sisu rituals');
       det.innerHTML =
