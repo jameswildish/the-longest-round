@@ -50,11 +50,10 @@ export default defineType({
     }),
     defineField({
       name: 'toStop',
-      title: 'Stage End',
+      title: 'Stage End / Stops At',
       type: 'reference',
       to: [{type: 'routeStop'}],
-      description: 'Leave blank if riding the full journey.',
-      hidden: ({parent}) => !!parent?.fullJourney,
+      description: 'For a stage guest, where their stage ends. For a full-journey rider, only set this if they stop partway rather than finishing the whole route — leave blank if they\'re going all the way to Morocco.',
     }),
     defineField({
       name: 'joinDay',

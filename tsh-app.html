@@ -131,7 +131,7 @@
   .ritual-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
   .ritual-count{font-size:11.5px;font-weight:600;color:var(--ink-faint);font-variant-numeric:tabular-nums;}
   .ritual-list{list-style:none;margin:0;padding:0;}
-  .ritual-list li{display:flex;align-items:center;gap:10px;padding:11px 2px;border-top:1px solid var(--hairline);font-size:13.5px;color:var(--ink-dim);cursor:pointer;user-select:none;}
+  .ritual-list li{display:flex;align-items:center;gap:10px;padding:11px 2px;border-top:1px solid var(--hairline);font-size:13.5px;color:var(--ink-dim);}
   .ritual-list li:first-child{border-top:none;}
   .ritual-list li .box{width:19px;height:19px;border-radius:7px;border:1.4px solid var(--hairline-strong);display:flex;align-items:center;justify-content:center;flex:none;transition:all .2s ease;}
   .ritual-list li .box svg{width:11px;height:11px;opacity:0;transform:scale(.5);transition:all .2s ease;}
@@ -297,9 +297,9 @@
             <div class="route-strip" id="routeStripGuest"></div>
 
             <div class="metric-grid" id="guestMetricGrid">
-              <div class="metric-tile"><div class="metric-top"><span class="metric-label">Distance</span></div><span class="metric-value" id="guestDistance"></span></div>
-              <div class="metric-tile"><div class="metric-top"><span class="metric-label">Duration</span></div><span class="metric-value" id="guestDuration"></span></div>
-              <div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Pace</span></div><span class="metric-value" id="guestPace"></span></div>
+              <div class="metric-tile"><div class="metric-top"><span class="metric-label" id="guestDistanceLabel">Distance</span></div><span class="metric-value" id="guestDistance"></span></div>
+              <div class="metric-tile"><div class="metric-top"><span class="metric-label" id="guestDurationLabel">Duration</span></div><span class="metric-value" id="guestDuration"></span></div>
+              <div class="metric-tile"><div class="metric-top"><span class="metric-label" id="guestPaceLabel">Avg Pace</span></div><span class="metric-value" id="guestPace"></span></div>
               <div class="metric-tile"><div class="metric-top"><span class="metric-label">Of Full Journey</span></div><span class="metric-value" id="guestContribPct"></span></div>
             </div>
 
@@ -544,31 +544,19 @@ function boot(sanityData){
     if (!e.insightOverride) e.insightOverride = '';
   });
 
-  // Ritual completion lives in localStorage so users can tick them off in-app
-  var RITUAL_STORAGE_KEY = 'tlr-rituals';
-  function getRitualState(){
-    try { return JSON.parse(localStorage.getItem(RITUAL_STORAGE_KEY)) || {}; } catch(e){ return {}; }
-  }
-  function saveRitualState(state){
-    try { localStorage.setItem(RITUAL_STORAGE_KEY, JSON.stringify(state)); } catch(e){}
-  }
   function isRitualDone(day, ritualId){
-    var state = getRitualState();
-    return state[day] && state[day].indexOf(ritualId) > -1;
-  }
-  function toggleRitual(day, ritualId){
-    var state = getRitualState();
-    if (!state[day]) state[day] = [];
-    var idx = state[day].indexOf(ritualId);
-    if (idx > -1) state[day].splice(idx, 1);
-    else state[day].push(ritualId);
-    saveRitualState(state);
+    var e = DAILY_ENTRIES.find(function(x){ return x.day===day; });
+    return !!(e && e.ritualsCompleted && e.ritualsCompleted.indexOf(ritualId) > -1);
   }
 
   GUESTS.forEach(function(g){
     var stopByOrder = function(o){ return ROUTE_STOPS.find(function(s){ return s.order===o; }); };
     var fromS = stopByOrder(g.fromStop), toS = stopByOrder(g.toStop);
-    g.stage = (g.fromStopName || (fromS&&fromS.name) || '') + ' → ' + (g.toStopName || (toS&&toS.name) || '');
+    if (g.fullJourney){
+      g.stage = (g.toStopName || (toS&&toS.name)) ? 'Full Journey - stopped at ' + (g.toStopName||toS.name) : 'Full Journey';
+    } else {
+      g.stage = (g.fromStopName || (fromS&&fromS.name) || '') + ' → ' + (g.toStopName || (toS&&toS.name) || '');
+    }
     g.stageComplete = DAILY_ENTRIES.some(function(e){ return e.ridingTodayGuestId === g.id && e.dayComplete; });
     g.contribPct = g.miles ? Math.round((g.miles/TOTAL_TARGET_MILES)*1000)/10 : 0;
     if (typeof g.duration !== 'string' && g.durationMinutes){
@@ -582,6 +570,14 @@ function boot(sanityData){
 
   var TODAY_ENTRY = DAILY_ENTRIES[DAILY_ENTRIES.length-1];
   var totalCycled = DAILY_ENTRIES.reduce(function(a,e){return a+(e.dayComplete?((e.cyclingMiles||0)+(e.swimmingMiles||0)):0);},0);
+  GUESTS.forEach(function(g){
+    if (!g.fullJourney) return;
+    g.miles = totalCycled;
+    g.contribPct = totalCycled ? Math.round((totalCycled/TOTAL_TARGET_MILES)*1000)/10 : 0;
+    var completeDays = DAILY_ENTRIES.filter(function(e){ return e.dayComplete; });
+    g.duration = completeDays.length + (completeDays.length===1 ? ' day' : ' days');
+    g.pace = completeDays.length ? Math.round(totalCycled/completeDays.length) + ' mi/day' : '—';
+  });
 
   /* ================================================================== */
 
@@ -617,14 +613,19 @@ function boot(sanityData){
   }
 
   function renderGuest(r){
-    var complete = !!r.stageComplete;
+    var complete = r.fullJourney ? (r.miles>0) : !!r.stageComplete;
     document.getElementById('guestStageTag').textContent = r.stage;
-    document.getElementById('guestMiles').textContent = complete ? r.miles : '—';
-    document.getElementById('guestMilesLabel').textContent = complete ? 'Miles On This Stage' : 'Stage In Progress';
-    document.getElementById('guestSummary').textContent = 'Joined Darren on ' + r.stage + ' - Day ' + r.joinDay + ' of The Longest Round.';
+    document.getElementById('guestMiles').textContent = complete ? r.miles.toLocaleString('en-GB') : '—';
+    document.getElementById('guestMilesLabel').textContent = r.fullJourney ? 'Miles So Far' : (complete ? 'Miles On This Stage' : 'Stage In Progress');
+    document.getElementById('guestSummary').textContent = r.fullJourney
+      ? 'Riding alongside Darren for the full journey - joined Day ' + r.joinDay + ' of The Longest Round.'
+      : 'Joined Darren on ' + r.stage + ' - Day ' + r.joinDay + ' of The Longest Round.';
     document.getElementById('guestMetricGrid').style.display = complete ? '' : 'none';
+    document.getElementById('guestDistanceLabel').textContent = r.fullJourney ? 'Distance So Far' : 'Distance';
+    document.getElementById('guestDurationLabel').textContent = r.fullJourney ? 'Days Ridden' : 'Duration';
+    document.getElementById('guestPaceLabel').textContent = r.fullJourney ? 'Avg Miles/Day' : 'Avg Pace';
     if (complete) {
-      document.getElementById('guestDistance').textContent = r.miles + ' mi';
+      document.getElementById('guestDistance').textContent = r.miles.toLocaleString('en-GB') + ' mi';
       document.getElementById('guestDuration').textContent = r.duration;
       document.getElementById('guestPace').textContent = r.pace;
       document.getElementById('guestContribPct').textContent = r.contribPct + '%';
@@ -638,27 +639,34 @@ function boot(sanityData){
     } else {
       noteCard.style.display = 'none';
     }
-    document.getElementById('guestStreakMiles').textContent = complete ? r.miles : '—';
+    document.getElementById('guestStreakMiles').textContent = complete ? r.miles.toLocaleString('en-GB') : '—';
     document.getElementById('guestStageCard').style.display = complete ? '' : 'none';
     if (complete) {
-      document.getElementById('guestLogTitle').textContent = r.miles + ' mi';
-      document.getElementById('guestLogMeta').textContent = r.stage + ' · ' + r.duration + ' · ' + r.pace + ' avg';
+      document.getElementById('guestLogTitle').textContent = r.miles.toLocaleString('en-GB') + ' mi';
+      document.getElementById('guestLogMeta').textContent = r.stage + ' · ' + r.duration + ' · ' + r.pace;
     }
-    document.getElementById('guestInsightText').textContent = complete
-      ? 'Your stage, ' + r.stage + ', made up ' + r.contribPct + '% of the full route to Morocco.'
-      : 'Your stage is still in progress. Stats will appear once it\'s complete.';
+    document.getElementById('guestInsightText').textContent = r.fullJourney
+      ? (complete ? r.miles.toLocaleString('en-GB') + ' miles alongside Darren so far, making up ' + r.contribPct + '% of the full route to Morocco.' : 'Not enough data yet. Check back once days are logged.')
+      : (complete
+        ? 'Your stage, ' + r.stage + ', made up ' + r.contribPct + '% of the full route to Morocco.'
+        : 'Your stage is still in progress. Stats will appear once it\'s complete.');
 
     var bestsGrid = document.getElementById('guestBestsGrid');
     bestsGrid.innerHTML = '';
     if (!complete) return;
-    [{label:'Distance', value:r.miles+' mi'},{label:'Avg Pace', value:r.pace},{label:'Duration', value:r.duration}].forEach(function(b){
+    [{label:'Distance', value:r.miles.toLocaleString('en-GB')+' mi'},{label:r.fullJourney?'Avg Miles/Day':'Avg Pace', value:r.pace},{label:r.fullJourney?'Days Ridden':'Duration', value:r.duration}].forEach(function(b){
       var tile = document.createElement('div');
       tile.className = 'best-tile';
       tile.innerHTML = '<span class="best-label">'+b.label+'</span><span class="best-value">'+b.value+'</span>';
       bestsGrid.appendChild(tile);
     });
 
-    renderRouteStrip('routeStripGuest', {range:[r.fromStop, r.toStop]});
+    if (r.fullJourney){
+      var endOrder = r.toStop!=null ? Math.min(r.toStop, currentStopOrder()) : currentStopOrder();
+      renderRouteStrip('routeStripGuest', {range:[0, endOrder]});
+    } else {
+      renderRouteStrip('routeStripGuest', {range:[r.fromStop, r.toStop]});
+    }
   }
 
   /* ---- Route strip: current = last stop already reached; guests get their own range highlighted ---- */
@@ -701,8 +709,8 @@ function boot(sanityData){
     document.getElementById('leadTag').innerHTML = 'Day <b>'+TODAY_ENTRY.day+'</b> · The Longest Round';
 
     var swimsDoneInsight = DAILY_ENTRIES.filter(function(e){ return e.swimmingMiles > 0; }).length;
-    var last7 = DAILY_ENTRIES.slice(-7);
-    var avg7 = Math.round(last7.reduce(function(a,e){return a+(e.cyclingMiles||0)+(e.swimmingMiles||0);},0)/last7.length);
+    var last7 = DAILY_ENTRIES.filter(function(e){ return e.dayComplete; }).slice(-7);
+    var avg7 = last7.length ? Math.round(last7.reduce(function(a,e){return a+(e.cyclingMiles||0)+(e.swimmingMiles||0);},0)/last7.length) : 0;
     document.getElementById('leadInsight').textContent =
       totalCycled.toLocaleString('en-GB') + ' miles travelled - averaging ' + avg7 + ' mi/day, with ' + swimsDoneInsight + ' of 2 swims complete.';
 
@@ -753,14 +761,6 @@ function boot(sanityData){
     var doneCount = document.querySelectorAll('#ritualList li.done').length;
     document.getElementById('ritualCount').textContent = doneCount+'/'+RITUALS.length;
   }
-  document.getElementById('ritualList').addEventListener('click', function(e){
-    var li = e.target.closest('li');
-    if(li){
-      li.classList.toggle('done');
-      toggleRitual(TODAY_ENTRY.day, li.dataset.ritual);
-      updateRitualCount();
-    }
-  });
 
   /* ---- Screen switching ---- */
   var screens = document.querySelectorAll('.screen');
@@ -801,10 +801,10 @@ function boot(sanityData){
 
   /* ---- Log: Summary tiles ---- */
   (function(){
-    var avgMiles = Math.round(totalCycled/DAILY_ENTRIES.length);
-    var ritStateSummary = getRitualState();
-    var totalRituals = DAILY_ENTRIES.reduce(function(a,e){var dr=ritStateSummary[e.day]||[];return a+dr.length;},0);
-    var ritualPct = Math.round(totalRituals/(DAILY_ENTRIES.length*RITUALS.length)*100);
+    var completeEntries = DAILY_ENTRIES.filter(function(e){ return e.dayComplete; });
+    var avgMiles = completeEntries.length ? Math.round(totalCycled/completeEntries.length) : 0;
+    var totalRituals = completeEntries.reduce(function(a,e){ return a+(e.ritualsCompleted||[]).length; },0);
+    var ritualPct = completeEntries.length ? Math.round(totalRituals/(completeEntries.length*RITUALS.length)*100) : 0;
     var swimsDoneSummary = DAILY_ENTRIES.filter(function(e){ return e.swimmingMiles > 0; }).length;
     var tiles = [
       {label:'Days Logged', value:DAILY_ENTRIES.filter(function(e){return e.dayComplete;}).length},
@@ -825,13 +825,13 @@ function boot(sanityData){
   (function(){
     var logList = document.getElementById('logList');
     DAILY_ENTRIES.slice().reverse().forEach(function(e){
-      var dots = RITUALS.map(function(r){ return '<span class="'+(isRitualDone(e.day,r.id)?'on':'')+'"></span>'; }).join('');
+      var dots = RITUALS.map(function(r){ return '<span class="'+((e.ritualsCompleted||[]).indexOf(r.id)>-1?'on':'')+'"></span>'; }).join('');
       var row = document.createElement('div');
       row.className = 'log-row';
       var sleepLabel = e.sleepMinutes!=null ? Math.floor(e.sleepMinutes/60)+'h '+(e.sleepMinutes%60)+'m sleep' : '';
       var distLabel = e.cyclingMiles!=null ? (e.swimmingMiles>0 ? (e.cyclingMiles+' mi + '+e.swimmingMiles+' mi swim') : (e.cyclingMiles+' mi')) : 'Data pending';
       var recoveryLabel = e.recoveryScore!=null ? e.recoveryScore+'% recharge' : '';
-      var metaParts = [sleepLabel, recoveryLabel, (getRitualState()[e.day]||[]).length+'/'+RITUALS.length+' rituals'].filter(function(s){return s;});
+      var metaParts = [sleepLabel, recoveryLabel, (e.ritualsCompleted||[]).length+'/'+RITUALS.length+' rituals'].filter(function(s){return s;});
       if (e.avgHeartRate) metaParts.push(e.avgHeartRate+' bpm');
       if (e.avgHRV) metaParts.push(e.avgHRV+' ms HRV');
       if (e.ridingTodayGuestId){
@@ -1068,7 +1068,7 @@ function boot(sanityData){
       routeStops: '*[_type=="routeStop"]|order(order asc){order,name,type,"arrivalTime":arrivalTime,lat,lng}',
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,"profilePic":profilePic.asset->url}',
-      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
+      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,fullJourney,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
       dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,dayComplete,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}'
     };
     return Promise.all([
