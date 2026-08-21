@@ -30,6 +30,31 @@ export default defineType({
       description: 'Only set on the two crossing days (Channel, Strait of Gibraltar).',
     }),
     defineField({
+      name: 'rideDurationMinutes',
+      title: 'Ride Duration (minutes)',
+      type: 'number',
+    }),
+    defineField({
+      name: 'elevationGainFt',
+      title: 'Elevation Gain (ft)',
+      type: 'number',
+    }),
+    defineField({
+      name: 'avgSpeedMph',
+      title: 'Avg Speed (mph)',
+      type: 'number',
+    }),
+    defineField({
+      name: 'avgCadence',
+      title: 'Avg Cadence (rpm)',
+      type: 'number',
+    }),
+    defineField({
+      name: 'avgPowerWatts',
+      title: 'Avg Power (watts)',
+      type: 'number',
+    }),
+    defineField({
       name: 'recoveryScore',
       title: 'Recharge Score (%)',
       type: 'number',
@@ -74,7 +99,32 @@ export default defineType({
       type: 'reference',
       weak: true,
       to: [{type: 'guestRider'}],
-      description: 'The full-journey guest rider this entry\'s companion health data below belongs to.',
+      description: 'The full-journey guest rider this entry\'s companion health and ride data below belongs to.',
+    }),
+    defineField({
+      name: 'companionRideDurationMinutes',
+      title: "Companion's Ride Duration (minutes)",
+      type: 'number',
+    }),
+    defineField({
+      name: 'companionElevationGainFt',
+      title: "Companion's Elevation Gain (ft)",
+      type: 'number',
+    }),
+    defineField({
+      name: 'companionAvgSpeedMph',
+      title: "Companion's Avg Speed (mph)",
+      type: 'number',
+    }),
+    defineField({
+      name: 'companionAvgCadence',
+      title: "Companion's Avg Cadence (rpm)",
+      type: 'number',
+    }),
+    defineField({
+      name: 'companionAvgPowerWatts',
+      title: "Companion's Avg Power (watts)",
+      type: 'number',
     }),
     defineField({
       name: 'companionRecoveryScore',

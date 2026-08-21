@@ -801,6 +801,11 @@ function boot(sanityData){
     var statTiles = '';
     statTiles += '<div class="stat-tile"><span class="stat-label">Cycling</span><span class="stat-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
     if (TODAY_ENTRY.swimmingMiles!=null) statTiles += '<div class="stat-tile"><span class="stat-label">Swimming</span><span class="stat-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Duration</span><span class="stat-value">'+(TODAY_ENTRY.rideDurationMinutes!=null?Math.floor(TODAY_ENTRY.rideDurationMinutes/60)+'h '+(TODAY_ENTRY.rideDurationMinutes%60)+'m':pending)+'</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Elevation Gain</span><span class="stat-value">'+(TODAY_ENTRY.elevationGainFt!=null?TODAY_ENTRY.elevationGainFt.toLocaleString('en-GB')+' ft':pending)+'</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Avg Speed</span><span class="stat-value">'+(TODAY_ENTRY.avgSpeedMph!=null?TODAY_ENTRY.avgSpeedMph+' mph':pending)+'</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Avg Cadence</span><span class="stat-value">'+(TODAY_ENTRY.avgCadence!=null?TODAY_ENTRY.avgCadence+' rpm':pending)+'</span></div>';
+    statTiles += '<div class="stat-tile"><span class="stat-label">Avg Power</span><span class="stat-value">'+(TODAY_ENTRY.avgPowerWatts!=null?TODAY_ENTRY.avgPowerWatts+' W':pending)+'</span></div>';
     statTiles += '<div class="stat-tile"><span class="stat-label">Recharge %</span><span class="stat-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
     statTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+(TODAY_ENTRY.sleepMinutes!=null?Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m':pending)+'</span></div>';
     statTiles += '<div class="stat-tile"><span class="stat-label">Activity HR (avg)</span><span class="stat-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';
@@ -1020,6 +1025,11 @@ function boot(sanityData){
       var detailTiles = '';
       detailTiles += '<div class="stat-tile"><span class="stat-label">Cycling</span><span class="stat-value">'+(e.cyclingMiles!=null?e.cyclingMiles+' mi':dp)+'</span></div>';
       if (e.swimmingMiles!=null) detailTiles += '<div class="stat-tile"><span class="stat-label">Swimming</span><span class="stat-value">'+e.swimmingMiles+' mi</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Duration</span><span class="stat-value">'+(e.rideDurationMinutes!=null?Math.floor(e.rideDurationMinutes/60)+'h '+(e.rideDurationMinutes%60)+'m':dp)+'</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Elevation Gain</span><span class="stat-value">'+(e.elevationGainFt!=null?e.elevationGainFt.toLocaleString('en-GB')+' ft':dp)+'</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Avg Speed</span><span class="stat-value">'+(e.avgSpeedMph!=null?e.avgSpeedMph+' mph':dp)+'</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Avg Cadence</span><span class="stat-value">'+(e.avgCadence!=null?e.avgCadence+' rpm':dp)+'</span></div>';
+      detailTiles += '<div class="stat-tile"><span class="stat-label">Avg Power</span><span class="stat-value">'+(e.avgPowerWatts!=null?e.avgPowerWatts+' W':dp)+'</span></div>';
       detailTiles += '<div class="stat-tile"><span class="stat-label">Recharge %</span><span class="stat-value">'+(e.recoveryScore!=null?e.recoveryScore+'%':dp)+'</span></div>';
       detailTiles += '<div class="stat-tile"><span class="stat-label">Sleep</span><span class="stat-value">'+(sleepLabel||dp)+'</span></div>';
       detailTiles += '<div class="stat-tile"><span class="stat-label">Activity HR (avg)</span><span class="stat-value">'+(e.avgHeartRate!=null?e.avgHeartRate+' bpm':dp)+'</span></div>';
@@ -1072,7 +1082,7 @@ function boot(sanityData){
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,"profilePic":profilePic.asset->url}',
       guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,role,initials,"profilePic":profilePic.asset->url,fullJourney,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,dayComplete,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}',
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,rideDurationMinutes,elevationGainFt,avgSpeedMph,avgCadence,avgPowerWatts,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,dayComplete,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}',
       locationUpdate: '*[_type=="locationUpdate"]|order(_createdAt desc)[0]{lat,lng,note}'
     };
     return Promise.all([

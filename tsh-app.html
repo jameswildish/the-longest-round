@@ -304,8 +304,13 @@
             </div>
 
             <div class="card" id="guestHealthCard" style="display:none;">
-              <span class="section-label" style="margin-bottom:6px;display:block;">Today's Health</span>
+              <span class="section-label" style="margin-bottom:6px;display:block;">Today's Ride &amp; Health</span>
               <div class="metric-grid">
+                <div class="metric-tile"><div class="metric-top"><span class="metric-label">Duration</span></div><span class="metric-value" id="guestHealthDuration"></span></div>
+                <div class="metric-tile"><div class="metric-top"><span class="metric-label">Elevation Gain</span></div><span class="metric-value" id="guestHealthElevation"></span></div>
+                <div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Speed</span></div><span class="metric-value" id="guestHealthSpeed"></span></div>
+                <div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Cadence</span></div><span class="metric-value" id="guestHealthCadence"></span></div>
+                <div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Power</span></div><span class="metric-value" id="guestHealthPower"></span></div>
                 <div class="metric-tile"><div class="metric-top"><span class="metric-label">Recharge %</span></div><span class="metric-value" id="guestHealthRecharge"></span></div>
                 <div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value" id="guestHealthSleep"></span></div>
                 <div class="metric-tile"><div class="metric-top"><span class="metric-label">Activity HR (avg)</span></div><span class="metric-value" id="guestHealthHR"></span></div>
@@ -639,6 +644,11 @@ function boot(sanityData){
     healthCard.style.display = hasHealthToday ? '' : 'none';
     if (hasHealthToday) {
       var hp = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
+      document.getElementById('guestHealthDuration').innerHTML = TODAY_ENTRY.companionRideDurationMinutes!=null ? Math.floor(TODAY_ENTRY.companionRideDurationMinutes/60)+'h '+(TODAY_ENTRY.companionRideDurationMinutes%60)+'m' : hp;
+      document.getElementById('guestHealthElevation').innerHTML = TODAY_ENTRY.companionElevationGainFt!=null ? TODAY_ENTRY.companionElevationGainFt.toLocaleString('en-GB')+' ft' : hp;
+      document.getElementById('guestHealthSpeed').innerHTML = TODAY_ENTRY.companionAvgSpeedMph!=null ? TODAY_ENTRY.companionAvgSpeedMph+' mph' : hp;
+      document.getElementById('guestHealthCadence').innerHTML = TODAY_ENTRY.companionAvgCadence!=null ? TODAY_ENTRY.companionAvgCadence+' rpm' : hp;
+      document.getElementById('guestHealthPower').innerHTML = TODAY_ENTRY.companionAvgPowerWatts!=null ? TODAY_ENTRY.companionAvgPowerWatts+' W' : hp;
       document.getElementById('guestHealthRecharge').innerHTML = TODAY_ENTRY.companionRecoveryScore!=null ? TODAY_ENTRY.companionRecoveryScore+'%' : hp;
       document.getElementById('guestHealthSleep').innerHTML = TODAY_ENTRY.companionSleepMinutes!=null ? Math.floor(TODAY_ENTRY.companionSleepMinutes/60)+'h '+(TODAY_ENTRY.companionSleepMinutes%60)+'m' : hp;
       document.getElementById('guestHealthHR').innerHTML = TODAY_ENTRY.companionAvgHeartRate!=null ? TODAY_ENTRY.companionAvgHeartRate+' bpm' : hp;
@@ -740,6 +750,11 @@ function boot(sanityData){
     var tiles = '';
     tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling</span></div><span class="metric-value">'+(TODAY_ENTRY.cyclingMiles!=null?TODAY_ENTRY.cyclingMiles+' mi':pending)+'</span></div>';
     if (TODAY_ENTRY.swimmingMiles!=null) tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming</span></div><span class="metric-value">'+TODAY_ENTRY.swimmingMiles+' mi</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Duration</span></div><span class="metric-value">'+(TODAY_ENTRY.rideDurationMinutes!=null?Math.floor(TODAY_ENTRY.rideDurationMinutes/60)+'h '+(TODAY_ENTRY.rideDurationMinutes%60)+'m':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Elevation Gain</span></div><span class="metric-value">'+(TODAY_ENTRY.elevationGainFt!=null?TODAY_ENTRY.elevationGainFt.toLocaleString('en-GB')+' ft':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Speed</span></div><span class="metric-value">'+(TODAY_ENTRY.avgSpeedMph!=null?TODAY_ENTRY.avgSpeedMph+' mph':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Cadence</span></div><span class="metric-value">'+(TODAY_ENTRY.avgCadence!=null?TODAY_ENTRY.avgCadence+' rpm':pending)+'</span></div>';
+    tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Power</span></div><span class="metric-value">'+(TODAY_ENTRY.avgPowerWatts!=null?TODAY_ENTRY.avgPowerWatts+' W':pending)+'</span></div>';
     tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recharge %</span></div><span class="metric-value">'+(TODAY_ENTRY.recoveryScore!=null?TODAY_ENTRY.recoveryScore+'%':pending)+'</span></div>';
     tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+(TODAY_ENTRY.sleepMinutes!=null?Math.floor(TODAY_ENTRY.sleepMinutes/60)+'h '+(TODAY_ENTRY.sleepMinutes%60)+'m':pending)+'</span></div>';
     tiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Activity HR (avg)</span></div><span class="metric-value">'+(TODAY_ENTRY.avgHeartRate!=null?TODAY_ENTRY.avgHeartRate+' bpm':pending)+'</span></div>';
@@ -1019,6 +1034,11 @@ function boot(sanityData){
     var sp = '<span style="color:var(--ink-faint);font-size:13px;">Data pending</span>';
     sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Cycling</span></div><span class="metric-value">'+(entry.cyclingMiles!=null?entry.cyclingMiles+' mi':sp)+'</span></div>';
     if (entry.swimmingMiles!=null) sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Swimming</span></div><span class="metric-value">'+entry.swimmingMiles+' mi</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Duration</span></div><span class="metric-value">'+(entry.rideDurationMinutes!=null?Math.floor(entry.rideDurationMinutes/60)+'h '+(entry.rideDurationMinutes%60)+'m':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Elevation Gain</span></div><span class="metric-value">'+(entry.elevationGainFt!=null?entry.elevationGainFt.toLocaleString('en-GB')+' ft':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Speed</span></div><span class="metric-value">'+(entry.avgSpeedMph!=null?entry.avgSpeedMph+' mph':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Cadence</span></div><span class="metric-value">'+(entry.avgCadence!=null?entry.avgCadence+' rpm':sp)+'</span></div>';
+    sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Avg Power</span></div><span class="metric-value">'+(entry.avgPowerWatts!=null?entry.avgPowerWatts+' W':sp)+'</span></div>';
     sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Recharge %</span></div><span class="metric-value">'+(entry.recoveryScore!=null?entry.recoveryScore+'%':sp)+'</span></div>';
     sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value">'+(entry.sleepMinutes!=null?Math.floor(entry.sleepMinutes/60)+'h '+(entry.sleepMinutes%60)+'m':sp)+'</span></div>';
     sheetTiles += '<div class="metric-tile"><div class="metric-top"><span class="metric-label">Activity HR (avg)</span></div><span class="metric-value">'+(entry.avgHeartRate!=null?entry.avgHeartRate+' bpm':sp)+'</span></div>';
@@ -1089,7 +1109,7 @@ function boot(sanityData){
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,"profilePic":profilePic.asset->url}',
       guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,role,initials,"profilePic":profilePic.asset->url,fullJourney,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,dayComplete,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV,"companionRiderId":companionRider->slug.current,companionRecoveryScore,companionSleepMinutes,companionAvgHeartRate,companionAvgHRV}'
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,rideDurationMinutes,elevationGainFt,avgSpeedMph,avgCadence,avgPowerWatts,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,dayComplete,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV,"companionRiderId":companionRider->slug.current,companionRideDurationMinutes,companionElevationGainFt,companionAvgSpeedMph,companionAvgCadence,companionAvgPowerWatts,companionRecoveryScore,companionSleepMinutes,companionAvgHeartRate,companionAvgHRV}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),
