@@ -44,6 +44,10 @@
   .site-nav{display:flex;gap:clamp(14px,2.4vw,26px);flex-wrap:wrap;}
   .site-nav a{font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-dim);text-decoration:none;font-weight:600;transition:color .2s ease;}
   .site-nav a:hover{color:var(--aurora-strong);}
+  .watch-live-btn{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--hairline-strong);border-radius:999px;color:var(--ink)!important;}
+  .watch-live-btn:hover{border-color:var(--ember);color:var(--ember-strong)!important;}
+  .watch-live-dot{width:7px;height:7px;border-radius:50%;background:var(--ember);flex:none;animation:liveDotPulse 1.8s ease-in-out infinite;}
+  @keyframes liveDotPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
 
   /* ---- Instagram ---- */
   .ig-cta{display:flex;align-items:stretch;gap:16px;margin-top:32px;flex-wrap:wrap;justify-content:center;}
@@ -301,6 +305,7 @@
     <a href="#archive">Journey Archive</a>
     <a href="#cause">Why This Ride</a>
     <a href="#sponsors">Sponsors &amp; Partners</a>
+    <a href="https://kick.com/cornerman" target="_blank" rel="noopener" class="watch-live-btn"><span class="watch-live-dot"></span>Watch Live</a>
   </nav>
 </header>
 <script>
