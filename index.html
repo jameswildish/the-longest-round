@@ -971,10 +971,12 @@ function boot(sanityData){
         var card = document.createElement('div');
         card.className = 'rider-card';
         var guestAvatar = g.profilePic ? '<img src="'+g.profilePic+'?w=88&h=88&fit=crop&auto=format" alt="'+g.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : g.initials;
-        var metaHtml = '<div class="rider-meta"><span>Day '+g.joinDay+'</span><span>'+(g.miles!=null?g.miles.toLocaleString('en-GB')+(g.fullJourney?' mi so far':' mi stage'):'—')+'</span><span>'+g.contribPct+'% of route</span></div>';
+        var dayLabel = g.fullJourney ? TODAY_ENTRY.day : g.joinDay;
+        var metaHtml = '<div class="rider-meta"><span>Day '+dayLabel+'</span><span>'+(g.miles!=null?g.miles.toLocaleString('en-GB')+(g.fullJourney?' mi so far':' mi stage'):'—')+'</span><span>'+g.contribPct+'% of route</span></div>';
         var quoteHtml = g.note ? '<p class="rider-quote">"'+g.note+'"</p>' : '';
+        var roleHtml = g.role ? '<div class="role">'+g.role+'</div>' : '';
         card.innerHTML =
-          '<div class="rider-card-head"><span class="avatar">'+guestAvatar+'</span><div><div class="name">'+g.name+'</div></div></div>'+
+          '<div class="rider-card-head"><span class="avatar">'+guestAvatar+'</span><div><div class="name">'+g.name+'</div>'+roleHtml+'</div></div>'+
           '<span class="rider-stage">'+g.stage+'</span>'+
           quoteHtml+
           metaHtml;
@@ -1069,7 +1071,7 @@ function boot(sanityData){
       routeStops: '*[_type=="routeStop"]|order(order asc){order,name,type,"arrivalTime":arrivalTime,lat,lng}',
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,"profilePic":profilePic.asset->url}',
-      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,fullJourney,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
+      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,role,initials,"profilePic":profilePic.asset->url,fullJourney,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
       dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,dayComplete,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}',
       locationUpdate: '*[_type=="locationUpdate"]|order(_createdAt desc)[0]{lat,lng,note}'
     };

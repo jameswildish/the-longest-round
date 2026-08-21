@@ -90,7 +90,7 @@
   .route-node.current .route-dot{background:var(--ember);border-color:var(--ember);box-shadow:0 0 0 4px var(--ember-dim);animation:routePulse 1.8s ease-in-out infinite;}
   @keyframes routePulse{0%,100%{box-shadow:0 0 0 4px var(--ember-dim);}50%{box-shadow:0 0 0 9px rgba(254,70,0,0);}}
   .route-line{position:absolute;top:5px;left:-31px;width:62px;height:2px;background:var(--hairline-strong);z-index:0;}
-  .route-node.done .route-line{background:var(--aurora);}
+  .route-node.done .route-line, .route-node.current .route-line{background:var(--aurora);}
   .route-node:first-child .route-line{display:none;}
   .route-label{font-size:9px;letter-spacing:0.02em;color:var(--ink-faint);text-align:center;line-height:1.2;}
   .route-node.current .route-label{color:var(--ink);font-weight:600;}
@@ -301,6 +301,16 @@
               <div class="metric-tile"><div class="metric-top"><span class="metric-label" id="guestDurationLabel">Duration</span></div><span class="metric-value" id="guestDuration"></span></div>
               <div class="metric-tile"><div class="metric-top"><span class="metric-label" id="guestPaceLabel">Avg Pace</span></div><span class="metric-value" id="guestPace"></span></div>
               <div class="metric-tile"><div class="metric-top"><span class="metric-label">Of Full Journey</span></div><span class="metric-value" id="guestContribPct"></span></div>
+            </div>
+
+            <div class="card" id="guestHealthCard" style="display:none;">
+              <span class="section-label" style="margin-bottom:6px;display:block;">Today's Health</span>
+              <div class="metric-grid">
+                <div class="metric-tile"><div class="metric-top"><span class="metric-label">Recharge %</span></div><span class="metric-value" id="guestHealthRecharge"></span></div>
+                <div class="metric-tile"><div class="metric-top"><span class="metric-label">Sleep</span></div><span class="metric-value" id="guestHealthSleep"></span></div>
+                <div class="metric-tile"><div class="metric-top"><span class="metric-label">Activity HR (avg)</span></div><span class="metric-value" id="guestHealthHR"></span></div>
+                <div class="metric-tile"><div class="metric-top"><span class="metric-label">Morning HRV</span></div><span class="metric-value" id="guestHealthHRV"></span></div>
+              </div>
             </div>
 
             <div class="card journal-card">
@@ -618,12 +628,22 @@ function boot(sanityData){
     document.getElementById('guestMiles').textContent = complete ? r.miles.toLocaleString('en-GB') : '—';
     document.getElementById('guestMilesLabel').textContent = r.fullJourney ? 'Miles So Far' : (complete ? 'Miles On This Stage' : 'Stage In Progress');
     document.getElementById('guestSummary').textContent = r.fullJourney
-      ? 'Riding alongside Darren for the full journey - joined Day ' + r.joinDay + ' of The Longest Round.'
+      ? 'Riding alongside Darren for the full journey - Day ' + TODAY_ENTRY.day + ' of The Longest Round.'
       : 'Joined Darren on ' + r.stage + ' - Day ' + r.joinDay + ' of The Longest Round.';
     document.getElementById('guestMetricGrid').style.display = complete ? '' : 'none';
     document.getElementById('guestDistanceLabel').textContent = r.fullJourney ? 'Distance So Far' : 'Distance';
     document.getElementById('guestDurationLabel').textContent = r.fullJourney ? 'Days Ridden' : 'Duration';
     document.getElementById('guestPaceLabel').textContent = r.fullJourney ? 'Avg Miles/Day' : 'Avg Pace';
+    var healthCard = document.getElementById('guestHealthCard');
+    var hasHealthToday = r.fullJourney && TODAY_ENTRY.companionRiderId === r.id;
+    healthCard.style.display = hasHealthToday ? '' : 'none';
+    if (hasHealthToday) {
+      var hp = '<span style="opacity:.45;font-size:13px;">Data pending</span>';
+      document.getElementById('guestHealthRecharge').innerHTML = TODAY_ENTRY.companionRecoveryScore!=null ? TODAY_ENTRY.companionRecoveryScore+'%' : hp;
+      document.getElementById('guestHealthSleep').innerHTML = TODAY_ENTRY.companionSleepMinutes!=null ? Math.floor(TODAY_ENTRY.companionSleepMinutes/60)+'h '+(TODAY_ENTRY.companionSleepMinutes%60)+'m' : hp;
+      document.getElementById('guestHealthHR').innerHTML = TODAY_ENTRY.companionAvgHeartRate!=null ? TODAY_ENTRY.companionAvgHeartRate+' bpm' : hp;
+      document.getElementById('guestHealthHRV').innerHTML = TODAY_ENTRY.companionAvgHRV!=null ? TODAY_ENTRY.companionAvgHRV+' ms' : hp;
+    }
     if (complete) {
       document.getElementById('guestDistance').textContent = r.miles.toLocaleString('en-GB') + ' mi';
       document.getElementById('guestDuration').textContent = r.duration;
@@ -1068,8 +1088,8 @@ function boot(sanityData){
       routeStops: '*[_type=="routeStop"]|order(order asc){order,name,type,"arrivalTime":arrivalTime,lat,lng}',
       rituals: '*[_type=="ritual"]|order(order asc){"id":slug.current,title,order}',
       lead: '*[_type=="leadRider"][0]{name,initials,"profilePic":profilePic.asset->url}',
-      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,initials,"profilePic":profilePic.asset->url,fullJourney,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
-      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,dayComplete,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV}'
+      guests: '*[_type=="guestRider"]|order(joinDay asc){"id":slug.current,name,role,initials,"profilePic":profilePic.asset->url,fullJourney,"fromStop":fromStop->order,"toStop":toStop->order,"fromStopName":fromStop->name,"toStopName":toStop->name,joinDay,miles,durationMinutes,avgPaceMph,note}',
+      dailyEntries: '*[_type=="dailyEntry"]|order(day asc){day,date,cyclingMiles,swimmingMiles,recoveryScore,sleepMinutes,"ritualsCompleted":ritualsCompleted[]->slug.current,"ridingTodayGuestId":ridingTodayGuest->slug.current,dayComplete,journal,"journalPhoto":journalPhoto.asset->url,insightOverride,avgHeartRate,avgHRV,"companionRiderId":companionRider->slug.current,companionRecoveryScore,companionSleepMinutes,companionAvgHeartRate,companionAvgHRV}'
     };
     return Promise.all([
       sanityQuery(queries.routeStops),

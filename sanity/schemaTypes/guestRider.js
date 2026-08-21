@@ -12,6 +12,12 @@ export default defineType({
       validation: (r) => r.required(),
     }),
     defineField({
+      name: 'role',
+      title: 'Title / Role',
+      type: 'string',
+      description: 'Shown under their name on the website, e.g. "Childhood Friend", "Cycling Coach", "Charity Ambassador".',
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
